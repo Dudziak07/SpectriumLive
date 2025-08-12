@@ -1,4 +1,5 @@
-﻿using SpectriumLive.Core;
+﻿using SpectriumLive.Application.Filters;
+using SpectriumLive.Core;
 
 namespace SpectriumLive.Application.Tests.Filters;
 
@@ -23,10 +24,10 @@ public class SepiaFilterTests
         {
             // newR = 0.393*R + 0.769*G + 0.189*B = 135
             // newG = 0.349*R + 0.686*G + 0.168*B = 120
-            // newB = 0.272*R + 0.534*G + 0.131*B = 94
+            // newB = 0.272*R + 0.534*G + 0.131*B = 93
             Assert.That(resultPixel.R, Is.EqualTo(135));
             Assert.That(resultPixel.G, Is.EqualTo(120));
-            Assert.That(resultPixel.B, Is.EqualTo(94));
+            Assert.That(resultPixel.B, Is.EqualTo(93));
             Assert.That(resultPixel.A, Is.EqualTo(255));
         });
     }
