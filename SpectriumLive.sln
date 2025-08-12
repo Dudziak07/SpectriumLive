@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectriumLive.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectriumLive.Wpf", "SpectriumLive.Wpf\SpectriumLive.Wpf.csproj", "{672C56B3-C985-48DA-8CE1-FE06C86FB587}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpectriumLive.Application.Tests", "tests\SpectriumLive.Application.Tests\SpectriumLive.Application.Tests.csproj", "{47996D26-D684-47CE-82DE-20899FF0224B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,8 +73,23 @@ Global
 		{672C56B3-C985-48DA-8CE1-FE06C86FB587}.Release|x64.Build.0 = Release|Any CPU
 		{672C56B3-C985-48DA-8CE1-FE06C86FB587}.Release|x86.ActiveCfg = Release|Any CPU
 		{672C56B3-C985-48DA-8CE1-FE06C86FB587}.Release|x86.Build.0 = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|x64.Build.0 = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Debug|x86.Build.0 = Debug|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|x64.ActiveCfg = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|x64.Build.0 = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|x86.ActiveCfg = Release|Any CPU
+		{47996D26-D684-47CE-82DE-20899FF0224B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{47996D26-D684-47CE-82DE-20899FF0224B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
