@@ -1,7 +1,7 @@
 ﻿using SpectriumLive.Application.Filters;
 using SpectriumLive.Core;
 
-namespace SpectriumLive.Application.Tests;
+namespace SpectriumLive.Application.Tests.Filters;
 
 [TestFixture]
 public class NegativeFilterTests
