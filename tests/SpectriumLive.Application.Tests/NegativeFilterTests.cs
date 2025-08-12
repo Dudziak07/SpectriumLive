@@ -1,4 +1,7 @@
-﻿namespace SpectriumLive.Application.Tests;
+﻿using SpectriumLive.Application.Filters;
+using SpectriumLive.Core;
+
+namespace SpectriumLive.Application.Tests;
 
 [TestFixture]
 public class NegativeFilterTests
@@ -8,7 +11,7 @@ public class NegativeFilterTests
     {
         // Arrange
         var filter = new NegativeFilter();
-        var whitePixel = new Pixel(255, 255, 255);
+        var whitePixel = new PixelData(255, 255, 255, 255);
         var image = new ImageBuffer(1, 1, [whitePixel]);
 
         // Act
