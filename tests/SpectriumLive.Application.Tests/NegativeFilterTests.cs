@@ -22,4 +22,3 @@ public class NegativeFilterTests
         Assert.That(resultPixel.A, Is.EqualTo(255));
     }
 }
-
