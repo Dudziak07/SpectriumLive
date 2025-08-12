@@ -5,7 +5,7 @@ namespace SpectriumLive.Application.Services;
 
 public class FilterService
 {
-    public static IEnumerable<IFilter> GetAvailableFilters()
+    public IEnumerable<IFilter> GetAvailableFilters()
     {
         var filterTypes = Assembly.GetExecutingAssembly()
             .GetTypes()
