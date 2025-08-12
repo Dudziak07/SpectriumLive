@@ -2,7 +2,7 @@
 
 namespace SpectriumLive.Application.Filters;
 
-internal class NegativeFilter : IFilter
+public class NegativeFilter : IFilter
 {
     public string Name => "Negative";
 
