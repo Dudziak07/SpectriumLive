@@ -30,11 +30,11 @@
             </Grid.ColumnDefinitions>
 
             <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0" Margin="5">
-                <Image x:Name="OriginalImage"/>
+                <Image x:Name="OriginalImage" Source="{Binding OriginalImage}"/>
             </Border>
 
             <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="1" Margin="5">
-                <Image x:Name="ProcessedImage"/>
+                <Image x:Name="ProcessedImage" Source="{Binding ProcessedImage}"/>
             </Border>
         </Grid>
     </Grid>
