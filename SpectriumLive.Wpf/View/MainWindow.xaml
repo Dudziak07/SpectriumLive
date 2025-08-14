@@ -13,8 +13,12 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
-            <Button Content="Load Image" Margin="0,0,0,10"/>
-            <Label Content="Available Filters:"/>
+            <Button
+                Content="Load Image"
+                Margin="0,0,0,10"
+                Command="{Binding LoadImageCommand}"/>
+            <Label
+                Content="Available Filters:"/>
 
             <ListBox ItemsSource="{Binding Filters}" DisplayMemberPath="Name" Height="450"/>
         </StackPanel>
