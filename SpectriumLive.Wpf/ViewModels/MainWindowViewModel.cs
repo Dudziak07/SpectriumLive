@@ -4,6 +4,7 @@ using SpectriumLive.Core;
 using SpectriumLive.Wpf.Commands;
 using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.ViewModels.Base;
+using System.IO;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -15,6 +16,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly FilterService filterService;
     public IEnumerable<IFilter> Filters { get; }
     public ICommand LoadImageCommand { get; }
+    public ICommand SaveImageCommand { get; }
 
     private ImageSource? originalImage;
     public ImageSource? OriginalImage
@@ -49,6 +51,7 @@ public class MainWindowViewModel : ViewModelBase
         Filters = this.filterService.GetAvailableFilters();
 
         LoadImageCommand = new RelayCommand(LoadImage);
+        SaveImageCommand = new RelayCommand(SaveImage, CanSaveImage);
     }
 
     private void LoadImage(object? parameter)
@@ -85,5 +88,33 @@ public class MainWindowViewModel : ViewModelBase
         var bufferCopy = new ImageBuffer(originalImageBuffer.Width, originalImageBuffer.Height, (PixelData[])originalImageBuffer.Pixels.Clone());
         SelectedFilter.Apply(bufferCopy);
         ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
+    }
+
+    private bool CanSaveImage(object? parameter)
+    {
+        return ProcessedImage is not null;
+    }
+
+    public void SaveImage(object? parameter)
+    {
+        if ( ProcessedImage is null )
+            return;
+
+        SaveFileDialog saveFileDialog = new()
+        {
+            Title = "Save Processed Image",
+            Filter = "PNG Image|*.png|JPEG Image|*.jpg;*.jpeg|Bitmap Image|*.bmp",
+            DefaultExt = ".png",
+            FileName = "processed_image.png"
+        };
+
+        if ( saveFileDialog.ShowDialog() is true )
+        {
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(ProcessedImage as BitmapSource));
+
+            using var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+            encoder.Save(fileStream);
+        }
     }
 }
