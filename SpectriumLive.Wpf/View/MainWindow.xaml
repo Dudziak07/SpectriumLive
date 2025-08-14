@@ -20,7 +20,11 @@
             <Label
                 Content="Available Filters:"/>
 
-            <ListBox ItemsSource="{Binding Filters}" DisplayMemberPath="Name" Height="450"/>
+            <ListBox
+                ItemsSource="{Binding Filters}"
+                DisplayMemberPath="Name"
+                Height="450"
+                SelectedItem="{Binding SelectedFilter}"/>
         </StackPanel>
 
         <Grid Grid.Column="1" Margin="10,0,0,0">

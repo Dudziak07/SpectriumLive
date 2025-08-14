@@ -2,6 +2,7 @@
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Wpf.Commands;
+using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.ViewModels.Base;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -29,6 +30,19 @@ public class MainWindowViewModel : ViewModelBase
         set => SetProperty(ref processedImage, value);
     }
 
+    private IFilter? selectedFilter;
+    public IFilter? SelectedFilter
+    {
+        get => selectedFilter;
+        set
+        {
+            SetProperty(ref selectedFilter, value);
+            ProcessImage();
+        }
+    }
+
+    private ImageBuffer? originalImageBuffer;
+
     public MainWindowViewModel(FilterService filterService)
     {
         this.filterService = filterService;
@@ -51,10 +65,25 @@ public class MainWindowViewModel : ViewModelBase
             bitmap.BeginInit();
             bitmap.UriSource = new(openFileDialog.FileName);
             bitmap.EndInit();
+            bitmap.Freeze();
 
             OriginalImage = bitmap;
+            originalImageBuffer = ImageConverter.ToImageBuffer(bitmap);
 
-            ProcessedImage = null;
+            ProcessImage();
         }
+    }
+
+    private void ProcessImage()
+    {
+        if ( originalImageBuffer is null || SelectedFilter is null )
+        {
+            ProcessedImage = null;
+            return;
+        }
+
+        var bufferCopy = new ImageBuffer(originalImageBuffer.Width, originalImageBuffer.Height, (PixelData[])originalImageBuffer.Pixels.Clone());
+        SelectedFilter.Apply(bufferCopy);
+        ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
     }
 }
