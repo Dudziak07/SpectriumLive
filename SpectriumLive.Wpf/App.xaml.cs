@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Services;
+using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.View;
 using SpectriumLive.Wpf.ViewModels;
 using System.Windows;
@@ -20,7 +22,7 @@ public partial class App : System.Windows.Application
         serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private static void ConfigureServices(IServiceCollection services)
     {
         // Register your services here
         services.AddSingleton<FilterService>();
@@ -28,6 +30,8 @@ public partial class App : System.Windows.Application
 
         // Add other services as needed
         services.AddSingleton<MainWindow>();
+
+        services.AddSingleton<IImageFileService, WpfImageFileService>();
     }
 
     protected override void OnStartup(StartupEventArgs e)

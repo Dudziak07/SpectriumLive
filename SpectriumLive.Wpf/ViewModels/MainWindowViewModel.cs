@@ -1,10 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Wpf.Commands;
 using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.ViewModels.Base;
-using System.IO;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -14,6 +13,7 @@ namespace SpectriumLive.Wpf.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly FilterService filterService;
+    private readonly IImageFileService imageFileService;
     public IEnumerable<IFilter> Filters { get; }
     public ICommand LoadImageCommand { get; }
     public ICommand SaveImageCommand { get; }
@@ -45,34 +45,26 @@ public class MainWindowViewModel : ViewModelBase
 
     private ImageBuffer? originalImageBuffer;
 
-    public MainWindowViewModel(FilterService filterService)
+    public MainWindowViewModel(
+        FilterService filterService,
+        IImageFileService imageFileService)
     {
         this.filterService = filterService;
-        Filters = this.filterService.GetAvailableFilters();
+        this.imageFileService = imageFileService;
 
+        Filters = this.filterService.GetAvailableFilters();
         LoadImageCommand = new RelayCommand(LoadImage);
         SaveImageCommand = new RelayCommand(SaveImage, CanSaveImage);
     }
 
     private void LoadImage(object? parameter)
     {
-        OpenFileDialog openFileDialog = new()
+        var loadedBuffer = imageFileService.LoadImage();
+
+        if ( loadedBuffer is not null )
         {
-            Title = "Select an Image",
-            Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp|All files|*.*"
-        };
-
-        if ( openFileDialog.ShowDialog() is true )
-        {
-            BitmapImage bitmap = new();
-            bitmap.BeginInit();
-            bitmap.UriSource = new(openFileDialog.FileName);
-            bitmap.EndInit();
-            bitmap.Freeze();
-
-            OriginalImage = bitmap;
-            originalImageBuffer = ImageConverter.ToImageBuffer(bitmap);
-
+            originalImageBuffer = loadedBuffer;
+            OriginalImage = ImageConverter.ToImageSource(originalImageBuffer);
             ProcessImage();
         }
     }
@@ -97,24 +89,10 @@ public class MainWindowViewModel : ViewModelBase
 
     public void SaveImage(object? parameter)
     {
-        if ( ProcessedImage is null )
-            return;
-
-        SaveFileDialog saveFileDialog = new()
+        if ( ProcessedImage is BitmapSource processedBitmap )
         {
-            Title = "Save Processed Image",
-            Filter = "PNG Image|*.png|JPEG Image|*.jpg;*.jpeg|Bitmap Image|*.bmp",
-            DefaultExt = ".png",
-            FileName = "processed_image.png"
-        };
-
-        if ( saveFileDialog.ShowDialog() is true )
-        {
-            BitmapEncoder encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(ProcessedImage as BitmapSource));
-
-            using var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create);
-            encoder.Save(fileStream);
+            var processedBuffer = ImageConverter.ToImageBuffer(processedBitmap);
+            imageFileService.SaveImage(processedBuffer);
         }
     }
 }
