@@ -52,7 +52,7 @@ public class MainWindowViewModel : ViewModelBase
         this.filterService = filterService;
         this.imageFileService = imageFileService;
 
-        Filters = this.filterService.GetAvailableFilters();
+        Filters = FilterService.GetAvailableFilters();
         LoadImageCommand = new RelayCommand(LoadImage);
         SaveImageCommand = new RelayCommand(SaveImage, CanSaveImage);
     }
