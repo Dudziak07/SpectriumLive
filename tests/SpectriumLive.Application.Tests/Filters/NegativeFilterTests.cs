@@ -21,9 +21,9 @@ public class NegativeFilterTests
         var resultPixel = image.Pixels[0];
         Assert.Multiple(() =>
         {
-            Assert.That(resultPixel.R, Is.EqualTo(0));
-            Assert.That(resultPixel.G, Is.EqualTo(0));
-            Assert.That(resultPixel.B, Is.EqualTo(0));
+            Assert.That(resultPixel.R, Is.EqualTo(0)); // 255 - 255 = 0
+            Assert.That(resultPixel.G, Is.EqualTo(0)); // 255 - 255 = 0
+            Assert.That(resultPixel.B, Is.EqualTo(0)); // 255 - 255 = 0
             Assert.That(resultPixel.A, Is.EqualTo(255));
         });
     }
