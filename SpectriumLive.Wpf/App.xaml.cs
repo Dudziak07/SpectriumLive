@@ -26,12 +26,12 @@ public partial class App : System.Windows.Application
     {
         // Register your services here
         services.AddSingleton<FilterService>();
+        services.AddSingleton<TextConverterService>();
+        services.AddSingleton<IImageFileService, WpfImageFileService>();
         services.AddSingleton<MainWindowViewModel>();
 
         // Add other services as needed
         services.AddSingleton<MainWindow>();
-
-        services.AddSingleton<IImageFileService, WpfImageFileService>();
     }
 
     protected override void OnStartup(StartupEventArgs e)

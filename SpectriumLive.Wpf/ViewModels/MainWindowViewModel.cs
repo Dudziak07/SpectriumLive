@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Application.Contracts;
+using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Wpf.Commands;
@@ -13,8 +14,13 @@ namespace SpectriumLive.Wpf.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly FilterService filterService;
+    private readonly TextConverterService textConverterService;
     private readonly IImageFileService imageFileService;
+
+    private const int AsciiArtWidth = 150; // Width for ASCII art conversion
+
     public IEnumerable<IFilter> Filters { get; }
+    public IEnumerable<IImageToTextConverter> TextConverters { get; }
     public ICommand LoadImageCommand { get; }
     public ICommand SaveImageCommand { get; }
 
@@ -43,16 +49,37 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    private string? asciiResult;
+    public string? AsciiResult
+    {
+        get => asciiResult;
+        set => SetProperty(ref asciiResult, value);
+    }
+
+    private IImageToTextConverter? selectedTextConverter;
+    public IImageToTextConverter? SelectedTextConverter
+    {
+        get => selectedTextConverter;
+        set
+        {
+            SetProperty(ref selectedTextConverter, value);
+            ConvertImageToText();
+        }
+    }
+
     private ImageBuffer? originalImageBuffer;
 
     public MainWindowViewModel(
         FilterService filterService,
-        IImageFileService imageFileService)
+        IImageFileService imageFileService,
+        TextConverterService textConverterService)
     {
         this.filterService = filterService;
         this.imageFileService = imageFileService;
+        this.textConverterService = textConverterService;
 
         Filters = FilterService.GetAvailableFilters();
+        TextConverters = textConverterService.GetAvailableConverters();
         LoadImageCommand = new RelayCommand(LoadImage);
         SaveImageCommand = new RelayCommand(SaveImage, CanSaveImage);
     }
@@ -66,6 +93,7 @@ public class MainWindowViewModel : ViewModelBase
             originalImageBuffer = loadedBuffer;
             OriginalImage = ImageConverter.ToImageSource(originalImageBuffer);
             ProcessImage();
+            ConvertImageToText();
         }
     }
 
@@ -94,5 +122,17 @@ public class MainWindowViewModel : ViewModelBase
             var processedBuffer = ImageConverter.ToImageBuffer(processedBitmap);
             imageFileService.SaveImage(processedBuffer);
         }
+    }
+
+    private void ConvertImageToText()
+    {
+        if ( originalImageBuffer is null || SelectedTextConverter is null )
+        {
+            AsciiResult = string.Empty;
+            return;
+        }
+        var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
+
+        AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
     }
 }
