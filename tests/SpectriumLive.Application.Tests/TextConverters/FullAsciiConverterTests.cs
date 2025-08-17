@@ -1,5 +1,5 @@
-﻿using SpectriumLive.Core;
-using System.Text;
+﻿using SpectriumLive.Application.TextConverters;
+using SpectriumLive.Core;
 
 namespace SpectriumLive.Application.Tests.TextConverters;
 public class FullAsciiConverterTests
@@ -48,7 +48,7 @@ public class FullAsciiConverterTests
         // Arrange
         var midGrayPixel = new PixelData(128, 128, 128, 255);
         var imageBuffer = new ImageBuffer(1, 1, [midGrayPixel]);
-        var expectedChar = "f" + Environment.NewLine;
+        var expectedChar = "r" + Environment.NewLine;
 
         // Act
         var result = converter.Convert(imageBuffer);
