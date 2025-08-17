@@ -10,6 +10,12 @@ public class AsciiConverterTests
     private static IEnumerable<TestCaseData> GetPixelTestCases()
     {
         yield return new TestCaseData(
+            AsciiCharacterRamps.Binary,
+            new PixelData(0, 0, 0, 255),
+            '#'
+        ).SetName("Black Pixel (Binary Ramp)");
+
+        yield return new TestCaseData(
             AsciiCharacterRamps.Simple,
             new PixelData(0, 0, 0, 255),
             '#'
@@ -22,6 +28,12 @@ public class AsciiConverterTests
         ).SetName("Black Pixel (Full Ramp)");
 
         yield return new TestCaseData(
+            AsciiCharacterRamps.Binary,
+            new PixelData(255, 255, 255, 255),
+            ' '
+        ).SetName("White Pixel (Binary Ramp)");
+
+        yield return new TestCaseData(
             AsciiCharacterRamps.Simple,
             new PixelData(255, 255, 255, 255),
             ' '
@@ -32,6 +44,12 @@ public class AsciiConverterTests
             new PixelData(255, 255, 255, 255),
             ' '
         ).SetName("White Pixel (Full Ramp)");
+
+        yield return new TestCaseData(
+            AsciiCharacterRamps.Binary,
+            new PixelData(128, 128, 128, 255),
+            '#'
+        ).SetName("Mid-Gray Pixel (Binary Ramp)");
 
         yield return new TestCaseData(
             AsciiCharacterRamps.Simple,
