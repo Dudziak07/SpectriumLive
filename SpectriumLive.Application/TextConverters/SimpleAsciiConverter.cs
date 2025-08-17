@@ -19,7 +19,8 @@ public class SimpleAsciiConverter : IImageToTextConverter
                 var pixel = imageBuffer.Pixels[y * imageBuffer.Width + x];
                 byte grayValue = ColorCalculator.ToGrayscale(pixel);
 
-                int index = grayValue * ( AsciiChars.Length - 1 ) / 255;
+                int index = (int)Math.Round(grayValue / 255.0 * ( AsciiChars.Length - 1 ));
+
                 result.Append(AsciiChars[index]);
             }
             result.AppendLine();

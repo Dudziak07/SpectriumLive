@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Application.Contracts;
+using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Wpf.Commands;
@@ -15,6 +16,9 @@ public class MainWindowViewModel : ViewModelBase
     private readonly FilterService filterService;
     private readonly TextConverterService textConverterService;
     private readonly IImageFileService imageFileService;
+
+    private const int AsciiArtWidth = 150; // Width for ASCII art conversion
+
     public IEnumerable<IFilter> Filters { get; }
     public IEnumerable<IImageToTextConverter> TextConverters { get; }
     public ICommand LoadImageCommand { get; }
@@ -127,6 +131,8 @@ public class MainWindowViewModel : ViewModelBase
             AsciiResult = string.Empty;
             return;
         }
-        AsciiResult = SelectedTextConverter.Convert(originalImageBuffer);
+        var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
+
+        AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
     }
 }
