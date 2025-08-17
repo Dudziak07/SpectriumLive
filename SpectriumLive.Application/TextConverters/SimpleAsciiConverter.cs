@@ -3,12 +3,12 @@ using SpectriumLive.Core;
 using System.Text;
 
 namespace SpectriumLive.Application.TextConverters;
-public class SimpleAsciiConverter
+public class SimpleAsciiConverter : IImageToTextConverter
 {
-    public static string Name => "ASCII (Simple)";
+    public string Name => "ASCII (Simple)";
     private static readonly char[] AsciiChars = ['#', '@', '%', '=', '+', '*', ':', '-', '.', ' '];
 
-    public static string Convert(ImageBuffer imageBuffer)
+    public string Convert(ImageBuffer imageBuffer)
     {
         var result = new StringBuilder();
 
