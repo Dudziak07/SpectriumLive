@@ -1,70 +1,68 @@
 ﻿using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.TextConverters;
 using SpectriumLive.Core;
+using Xunit;
 
 namespace SpectriumLive.Application.Tests.TextConverters;
 
-[TestFixture]
 public class AsciiConverterTests
 {
-    private static IEnumerable<TestCaseData> GetPixelTestCases()
+    public static IEnumerable<object[]> GetPixelTestCases()
     {
-        yield return new TestCaseData(
+        // Black
+        yield return new object[] {
             AsciiCharacterRamps.Binary,
             new PixelData(0, 0, 0, 255),
             '#'
-        ).SetName("Black Pixel (Binary Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Simple,
             new PixelData(0, 0, 0, 255),
             '#'
-        ).SetName("Black Pixel (Simple Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Full,
             new PixelData(0, 0, 0, 255),
             '$'
-        ).SetName("Black Pixel (Full Ramp)");
+        };
 
-        yield return new TestCaseData(
+        // White
+        yield return new object[] {
             AsciiCharacterRamps.Binary,
             new PixelData(255, 255, 255, 255),
             ' '
-        ).SetName("White Pixel (Binary Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Simple,
             new PixelData(255, 255, 255, 255),
             ' '
-        ).SetName("White Pixel (Simple Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Full,
             new PixelData(255, 255, 255, 255),
             ' '
-        ).SetName("White Pixel (Full Ramp)");
+        };
 
-        yield return new TestCaseData(
+        // Mid-Gray
+        yield return new object[] {
             AsciiCharacterRamps.Binary,
             new PixelData(128, 128, 128, 255),
             '#'
-        ).SetName("Mid-Gray Pixel (Binary Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Simple,
             new PixelData(128, 128, 128, 255),
             '+'
-        ).SetName("Mid-Gray Pixel (Simple Ramp)");
-
-        yield return new TestCaseData(
+        };
+        yield return new object[] {
             AsciiCharacterRamps.Full,
             new PixelData(128, 128, 128, 255),
             'r'
-        ).SetName("Mid-Gray Pixel (Full Ramp)");
+        };
     }
 
-    [TestCaseSource(nameof(GetPixelTestCases))]
+    [Theory]
+    [MemberData(nameof(GetPixelTestCases))]
     public void Convert_WithPixel_ReturnsCorrectChar(char[] ramp, PixelData pixel, char expectedChar)
     {
         // Arrange
@@ -76,6 +74,6 @@ public class AsciiConverterTests
         var result = converter.Convert(imageBuffer);
 
         // Assert
-        Assert.That(result, Is.EqualTo(expected));
+        Assert.Equal(expected, result);
     }
 }
