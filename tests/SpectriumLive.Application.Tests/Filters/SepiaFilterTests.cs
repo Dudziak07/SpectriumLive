@@ -1,12 +1,12 @@
 ﻿using SpectriumLive.Application.Filters;
 using SpectriumLive.Core;
+using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters;
 
-[TestFixture]
 public class SepiaFilterTests
 {
-    [Test]
+    [Fact]
     public void Apply_OnMidGrayPixel_ReturnsCorrectSepiaValues()
     {
         // Arrange
@@ -20,12 +20,9 @@ public class SepiaFilterTests
         // Assert
         var resultPixel = image.Pixels[0];
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(resultPixel.R, Is.EqualTo(135)); // 0.393*R + 0.769*G + 0.189*B = 135
-            Assert.That(resultPixel.G, Is.EqualTo(120)); // 0.349*R + 0.686*G + 0.168*B = 120
-            Assert.That(resultPixel.B, Is.EqualTo(93)); // 0.272*R + 0.534*G + 0.131*B = 93
-            Assert.That(resultPixel.A, Is.EqualTo(255));
-        });
+        Assert.Equal(135, resultPixel.R); // 0.393*R + 0.769*G + 0.189*B = 135
+        Assert.Equal(120, resultPixel.G); // 0.349*R + 0.686*G + 0.168*B = 120
+        Assert.Equal(93, resultPixel.B); // 0.272*R + 0.534*G + 0.131*B = 93
+        Assert.Equal(255, resultPixel.A);
     }
 }
