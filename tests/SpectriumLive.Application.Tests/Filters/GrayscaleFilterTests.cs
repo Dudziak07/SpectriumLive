@@ -1,12 +1,12 @@
 ﻿using SpectriumLive.Application.Filters;
 using SpectriumLive.Core;
+using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters;
 
-[TestFixture]
 public class GrayscaleFilterTests
 {
-    [Test]
+    [Fact]
     public void Apply_OnColorPixel_ReturnsCorrectGrayscaleValue()
     {
         // Arrange
@@ -21,12 +21,9 @@ public class GrayscaleFilterTests
         var resultPixel = imageBuffer.Pixels[0];
         var expectedGrayValue = 140; // (0.299 * 100 + 0.587 * 150 + 0.114 * 200)
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(resultPixel.R, Is.EqualTo(expectedGrayValue));
-            Assert.That(resultPixel.G, Is.EqualTo(expectedGrayValue));
-            Assert.That(resultPixel.B, Is.EqualTo(expectedGrayValue));
-            Assert.That(resultPixel.A, Is.EqualTo(255));
-        });
+        Assert.Equal(expectedGrayValue, resultPixel.R);
+        Assert.Equal(expectedGrayValue, resultPixel.G);
+        Assert.Equal(expectedGrayValue, resultPixel.B);
+        Assert.Equal(255, resultPixel.A);
     }
 }

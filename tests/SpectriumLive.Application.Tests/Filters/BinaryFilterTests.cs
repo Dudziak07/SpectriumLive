@@ -1,5 +1,6 @@
 ﻿using SpectriumLive.Application.Filters;
 using SpectriumLive.Core;
+using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters;
 
@@ -7,7 +8,7 @@ public class BinaryFilterTests
 {
     private const byte Threshold = 128;
 
-    [Test]
+    [Fact]
     public void Apply_OnDarkPixel_ReturnsBlackPixel()
     {
         // Arrange
@@ -21,16 +22,13 @@ public class BinaryFilterTests
         // Assert
         var resultPixel = image.Pixels[0];
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(resultPixel.R, Is.EqualTo(0));
-            Assert.That(resultPixel.G, Is.EqualTo(0));
-            Assert.That(resultPixel.B, Is.EqualTo(0));
-            Assert.That(resultPixel.A, Is.EqualTo(255));
-        });
+        Assert.Equal(0, resultPixel.R);
+        Assert.Equal(0, resultPixel.G);
+        Assert.Equal(0, resultPixel.B);
+        Assert.Equal(255, resultPixel.A);
     }
 
-    [Test]
+    [Fact]
     public void Apply_OnLightPixel_ReturnsWhitePixel()
     {
         // Arrange
@@ -44,12 +42,9 @@ public class BinaryFilterTests
         // Assert
         var resultPixel = image.Pixels[0];
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(resultPixel.R, Is.EqualTo(255));
-            Assert.That(resultPixel.G, Is.EqualTo(255));
-            Assert.That(resultPixel.B, Is.EqualTo(255));
-            Assert.That(resultPixel.A, Is.EqualTo(255));
-        });
+        Assert.Equal(255, resultPixel.R);
+        Assert.Equal(255, resultPixel.G);
+        Assert.Equal(255, resultPixel.B);
+        Assert.Equal(255, resultPixel.A);
     }
 }

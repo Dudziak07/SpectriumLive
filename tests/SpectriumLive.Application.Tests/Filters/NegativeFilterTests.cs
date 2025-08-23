@@ -1,12 +1,12 @@
 ﻿using SpectriumLive.Application.Filters;
 using SpectriumLive.Core;
+using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters;
 
-[TestFixture]
 public class NegativeFilterTests
 {
-    [Test]
+    [Fact]
     public void Apply_OnWhitePixel_ReturnsBlackPixel()
     {
         // Arrange
@@ -20,12 +20,9 @@ public class NegativeFilterTests
         // Assert
         var resultPixel = image.Pixels[0];
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(resultPixel.R, Is.EqualTo(0)); // 255 - 255 = 0
-            Assert.That(resultPixel.G, Is.EqualTo(0)); // 255 - 255 = 0
-            Assert.That(resultPixel.B, Is.EqualTo(0)); // 255 - 255 = 0
-            Assert.That(resultPixel.A, Is.EqualTo(255));
-        });
+        Assert.Equal(0, resultPixel.R); // 255 - 255 = 0
+        Assert.Equal(0, resultPixel.G); // 255 - 255 = 0
+        Assert.Equal(0, resultPixel.B); // 255 - 255 = 0
+        Assert.Equal(255, resultPixel.A);
     }
 }
