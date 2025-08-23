@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Application.Filters;
+using SpectriumLive.Application.Filters.Convolution;
 using SpectriumLive.Core;
 
 namespace SpectriumLive.Application.Services;
@@ -19,5 +20,10 @@ public class FilterService
         yield return new ChannelFilter("Red Channel", ChannelSelector.R);
         yield return new ChannelFilter("Green Channel", ChannelSelector.G);
         yield return new ChannelFilter("Blue Channel", ChannelSelector.B);
+
+        // Convolution
+        yield return new BoxBlurFilter();
+        yield return new GaussianBlurFilter();
+        yield return new EdgeDetectionFilter();
     }
 }
