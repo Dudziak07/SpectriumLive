@@ -5,7 +5,9 @@ using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Wpf.Converters;
+using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.ViewModels.Base;
+using System.Collections.ObjectModel;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -14,16 +16,19 @@ namespace SpectriumLive.Wpf.ViewModels;
 public partial class MainWindowViewModel(
     FilterService filterService,
     IImageFileService imageFileService,
-    TextConverterService textConverterService) : ViewModelBase
+    TextConverterService textConverterService,
+    CameraService cameraService) : ViewModelBase
 {
     private readonly FilterService filterService = filterService;
     private readonly TextConverterService textConverterService = textConverterService;
     private readonly IImageFileService imageFileService = imageFileService;
+    private readonly CameraService cameraService = cameraService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
 
     public IEnumerable<IFilter> Filters { get; } = FilterService.GetAvailableFilters();
     public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
+    public ObservableCollection<string> AvailableCameras { get; } = cameraService.GetAvailableCameras();
 
     [ObservableProperty]
     private ImageSource? originalImage;
@@ -39,6 +44,9 @@ public partial class MainWindowViewModel(
 
     [ObservableProperty]
     private IImageToTextConverter? selectedTextConverter;
+
+    [ObservableProperty]
+    private int selectedCameraIndex = -1;
 
     private ImageBuffer? originalImageBuffer;
 
@@ -88,6 +96,28 @@ public partial class MainWindowViewModel(
         }
         var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
         AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
+    }
+
+    [RelayCommand]
+    private void StartCamera()
+    {
+        if ( SelectedCameraIndex >= 0 )
+            cameraService.StartCamera(SelectedCameraIndex, OnNewCameraFrame);
+    }
+
+    [RelayCommand]
+    private void StopCamera()
+    {
+        cameraService.StopCamera();
+        OriginalImage = null;
+    }
+
+    private void OnNewCameraFrame(BitmapSource frame)
+    {
+        OriginalImage = frame;
+        originalImageBuffer = ImageConverter.ToImageBuffer(frame);
+        ProcessImage();
+        ConvertImageToText();
     }
 
     partial void OnOriginalImageChanged(ImageSource? value)

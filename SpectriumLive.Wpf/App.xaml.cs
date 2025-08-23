@@ -31,6 +31,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<MainWindowViewModel>();
 
         // Add other services as needed
+        services.AddSingleton<CameraService>();
         services.AddSingleton<MainWindow>();
     }
 
