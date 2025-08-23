@@ -1,5 +1,5 @@
-﻿using SpectriumLive.Core;
-using System.Reflection;
+﻿using SpectriumLive.Application.Filters;
+using SpectriumLive.Core;
 
 namespace SpectriumLive.Application.Services;
 
@@ -7,16 +7,13 @@ public class FilterService
 {
     public static IEnumerable<IFilter> GetAvailableFilters()
     {
-        var filterTypes = Assembly.GetExecutingAssembly()
-            .GetTypes()
-            .Where(t => typeof(IFilter).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
+        yield return new BinaryFilter();
+        yield return new GrayscaleFilter();
+        yield return new NegativeFilter();
+        yield return new SepiaFilter();
 
-        foreach ( var type in filterTypes )
-        {
-            if ( Activator.CreateInstance(type) is IFilter filter )
-            {
-                yield return filter;
-            }
-        }
+        yield return new SwapChannelsFilter("Swap Channels (Red-Blue)", SwapMode.RB);
+        yield return new SwapChannelsFilter("Swap Channels (Red-Green)", SwapMode.RG);
+        yield return new SwapChannelsFilter("Swap Channels (Green-Blue)", SwapMode.GB);
     }
 }
