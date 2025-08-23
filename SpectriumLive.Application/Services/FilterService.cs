@@ -15,5 +15,9 @@ public class FilterService
         yield return new SwapChannelsFilter("Swap Channels (Red-Blue)", SwapMode.RB);
         yield return new SwapChannelsFilter("Swap Channels (Red-Green)", SwapMode.RG);
         yield return new SwapChannelsFilter("Swap Channels (Green-Blue)", SwapMode.GB);
+
+        yield return new ChannelFilter("Red Channel", ChannelSelector.R);
+        yield return new ChannelFilter("Green Channel", ChannelSelector.G);
+        yield return new ChannelFilter("Blue Channel", ChannelSelector.B);
     }
 }
