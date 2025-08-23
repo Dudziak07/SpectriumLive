@@ -7,58 +7,27 @@ namespace SpectriumLive.Application.Tests.TextConverters;
 
 public class AsciiConverterTests
 {
-    public static IEnumerable<object[]> GetPixelTestCases()
+    public static TheoryData<char[], PixelData, char> GetPixelTestCases()
     {
-        // Black
-        yield return new object[] {
-            AsciiCharacterRamps.Binary,
-            new PixelData(0, 0, 0, 255),
-            '#'
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Simple,
-            new PixelData(0, 0, 0, 255),
-            '#'
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Full,
-            new PixelData(0, 0, 0, 255),
-            '$'
+        var data = new TheoryData<char[], PixelData, char>
+        {
+            // Black
+            { AsciiCharacterRamps.Binary, new PixelData(0, 0, 0, 255), '#' },
+            { AsciiCharacterRamps.Simple, new PixelData(0, 0, 0, 255), '#' },
+            { AsciiCharacterRamps.Full, new PixelData(0, 0, 0, 255), '$' },
+
+            // White
+            { AsciiCharacterRamps.Binary, new PixelData(255, 255, 255, 255), ' ' },
+            { AsciiCharacterRamps.Simple, new PixelData(255, 255, 255, 255), ' ' },
+            { AsciiCharacterRamps.Full, new PixelData(255, 255, 255, 255), ' ' },
+
+            // Mid-Gray
+            { AsciiCharacterRamps.Binary, new PixelData(128, 128, 128, 255), '#' },
+            { AsciiCharacterRamps.Simple, new PixelData(128, 128, 128, 255), '+' },
+            { AsciiCharacterRamps.Full, new PixelData(128, 128, 128, 255), 'r' }
         };
 
-        // White
-        yield return new object[] {
-            AsciiCharacterRamps.Binary,
-            new PixelData(255, 255, 255, 255),
-            ' '
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Simple,
-            new PixelData(255, 255, 255, 255),
-            ' '
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Full,
-            new PixelData(255, 255, 255, 255),
-            ' '
-        };
-
-        // Mid-Gray
-        yield return new object[] {
-            AsciiCharacterRamps.Binary,
-            new PixelData(128, 128, 128, 255),
-            '#'
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Simple,
-            new PixelData(128, 128, 128, 255),
-            '+'
-        };
-        yield return new object[] {
-            AsciiCharacterRamps.Full,
-            new PixelData(128, 128, 128, 255),
-            'r'
-        };
+        return data;
     }
 
     [Theory]

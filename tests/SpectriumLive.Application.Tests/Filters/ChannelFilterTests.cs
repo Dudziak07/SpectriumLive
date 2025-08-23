@@ -5,12 +5,17 @@ using Xunit;
 namespace SpectriumLive.Application.Tests.Filters;
 public class ChannelFilterTests
 {
-    public static IEnumerable<object[]> GetChannelTestData()
+    public static TheoryData<ChannelSelector, PixelData, PixelData> GetChannelTestData()
     {
         var inputPixel = new PixelData(200, 50, 100, 255);
-        yield return new object[] { ChannelSelector.R, inputPixel, new PixelData(200, 0, 0, 255) };
-        yield return new object[] { ChannelSelector.G, inputPixel, new PixelData(0, 50, 0, 255) };
-        yield return new object[] { ChannelSelector.B, inputPixel, new PixelData(0, 0, 100, 255) };
+        var data = new TheoryData<ChannelSelector, PixelData, PixelData>
+        {
+            { ChannelSelector.R, inputPixel, new PixelData(200, 0, 0, 255) },
+            { ChannelSelector.G, inputPixel, new PixelData(0, 50, 0, 255) },
+            { ChannelSelector.B, inputPixel, new PixelData(0, 0, 100, 255) }
+        };
+
+        return data;
     }
 
     [Theory]
