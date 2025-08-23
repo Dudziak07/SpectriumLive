@@ -1,4 +1,5 @@
-﻿using SpectriumLive.Core;
+﻿using SpectriumLive.Application.Filters;
+using SpectriumLive.Core;
 using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters;
