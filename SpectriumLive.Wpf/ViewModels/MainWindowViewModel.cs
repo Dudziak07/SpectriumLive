@@ -1,90 +1,49 @@
-﻿using SpectriumLive.Application.Contracts;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
-using SpectriumLive.Wpf.Commands;
 using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.ViewModels.Base;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace SpectriumLive.Wpf.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel(
+    FilterService filterService,
+    IImageFileService imageFileService,
+    TextConverterService textConverterService) : ViewModelBase
 {
-    private readonly FilterService filterService;
-    private readonly TextConverterService textConverterService;
-    private readonly IImageFileService imageFileService;
+    private readonly FilterService filterService = filterService;
+    private readonly TextConverterService textConverterService = textConverterService;
+    private readonly IImageFileService imageFileService = imageFileService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
 
-    public IEnumerable<IFilter> Filters { get; }
-    public IEnumerable<IImageToTextConverter> TextConverters { get; }
-    public ICommand LoadImageCommand { get; }
-    public ICommand SaveImageCommand { get; }
+    public IEnumerable<IFilter> Filters { get; } = FilterService.GetAvailableFilters();
+    public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
 
+    [ObservableProperty]
     private ImageSource? originalImage;
-    public ImageSource? OriginalImage
-    {
-        get => originalImage;
-        set => SetProperty(ref originalImage, value);
-    }
 
+    [ObservableProperty]
     private ImageSource? processedImage;
-    public ImageSource? ProcessedImage
-    {
-        get => processedImage;
-        set => SetProperty(ref processedImage, value);
-    }
 
+    [ObservableProperty]
     private IFilter? selectedFilter;
-    public IFilter? SelectedFilter
-    {
-        get => selectedFilter;
-        set
-        {
-            SetProperty(ref selectedFilter, value);
-            ProcessImage();
-        }
-    }
 
+    [ObservableProperty]
     private string? asciiResult;
-    public string? AsciiResult
-    {
-        get => asciiResult;
-        set => SetProperty(ref asciiResult, value);
-    }
 
+    [ObservableProperty]
     private IImageToTextConverter? selectedTextConverter;
-    public IImageToTextConverter? SelectedTextConverter
-    {
-        get => selectedTextConverter;
-        set
-        {
-            SetProperty(ref selectedTextConverter, value);
-            ConvertImageToText();
-        }
-    }
 
     private ImageBuffer? originalImageBuffer;
 
-    public MainWindowViewModel(
-        FilterService filterService,
-        IImageFileService imageFileService,
-        TextConverterService textConverterService)
-    {
-        this.filterService = filterService;
-        this.imageFileService = imageFileService;
-        this.textConverterService = textConverterService;
-
-        Filters = FilterService.GetAvailableFilters();
-        TextConverters = textConverterService.GetAvailableConverters();
-        LoadImageCommand = new RelayCommand(LoadImage);
-        SaveImageCommand = new RelayCommand(SaveImage, CanSaveImage);
-    }
-
-    private void LoadImage(object? parameter)
+    [RelayCommand]
+    private void LoadImage()
     {
         var loadedBuffer = imageFileService.LoadImage();
 
@@ -92,8 +51,6 @@ public class MainWindowViewModel : ViewModelBase
         {
             originalImageBuffer = loadedBuffer;
             OriginalImage = ImageConverter.ToImageSource(originalImageBuffer);
-            ProcessImage();
-            ConvertImageToText();
         }
     }
 
@@ -101,7 +58,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         if ( originalImageBuffer is null || SelectedFilter is null )
         {
-            ProcessedImage = null;
+            ProcessedImage = OriginalImage;
             return;
         }
 
@@ -110,12 +67,10 @@ public class MainWindowViewModel : ViewModelBase
         ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
     }
 
-    private bool CanSaveImage(object? parameter)
-    {
-        return ProcessedImage is not null;
-    }
+    private bool CanSaveImage() => ProcessedImage is not null;
 
-    public void SaveImage(object? parameter)
+    [RelayCommand(CanExecute = nameof(CanSaveImage))]
+    public void SaveImage()
     {
         if ( ProcessedImage is BitmapSource processedBitmap )
         {
@@ -132,7 +87,15 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
         var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
-
         AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
     }
+
+    partial void OnOriginalImageChanged(ImageSource? value)
+    {
+        ProcessImage();
+        ConvertImageToText();
+    }
+
+    partial void OnSelectedFilterChanged(IFilter? value) => ProcessImage();
+    partial void OnSelectedTextConverterChanged(IImageToTextConverter? value) => ConvertImageToText();
 }
