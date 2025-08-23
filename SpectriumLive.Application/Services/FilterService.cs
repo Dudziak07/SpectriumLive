@@ -21,6 +21,8 @@ public class FilterService
         yield return new ChannelFilter("Green Channel", ChannelSelector.G);
         yield return new ChannelFilter("Blue Channel", ChannelSelector.B);
 
+        // Convolution
         yield return new BoxBlurFilter();
+        yield return new GaussianBlurFilter();
     }
 }
