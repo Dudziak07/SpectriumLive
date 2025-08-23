@@ -24,5 +24,6 @@ public class FilterService
         // Convolution
         yield return new BoxBlurFilter();
         yield return new GaussianBlurFilter();
+        yield return new EdgeDetectionFilter();
     }
 }

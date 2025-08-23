@@ -7,6 +7,7 @@ public abstract class ConvolutionFilterBase : IFilter
     protected abstract double[,] Kernel { get; }
     protected virtual double Factor { get; } = 1.0;
     protected virtual double Bias { get; } = 0.0;
+    protected virtual bool UseAbsoulteValue { get; } = false;
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -38,6 +39,13 @@ public abstract class ConvolutionFilterBase : IFilter
                         sumG += p.G * k;
                         sumB += p.B * k;
                     }
+                }
+
+                if ( UseAbsoulteValue )
+                {
+                    sumR = Math.Abs(sumR);
+                    sumG = Math.Abs(sumG);
+                    sumB = Math.Abs(sumB);
                 }
 
                 byte finalR = (byte)Math.Max(0, Math.Min(255, Factor * sumR + Bias));
