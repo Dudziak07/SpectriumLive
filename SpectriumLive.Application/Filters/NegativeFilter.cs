@@ -8,7 +8,7 @@ public class NegativeFilter : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( int i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
@@ -17,6 +17,6 @@ public class NegativeFilter : IFilter
             byte newB = (byte)( 255 - pixel.B );
 
             imageBuffer.Pixels[i] = new(newR, newG, newB, pixel.A);
-        }
+        });
     }
 }

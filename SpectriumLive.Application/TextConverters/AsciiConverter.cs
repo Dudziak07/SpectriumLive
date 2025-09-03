@@ -3,25 +3,26 @@ using SpectriumLive.Core;
 using System.Text;
 
 namespace SpectriumLive.Application.TextConverters;
-public class AsciiConverter(string name, char[] ramp) : IImageToTextConverter
+public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConverter
 {
     public string Name { get; } = name;
 
     public string Convert(ImageBuffer imageBuffer)
     {
-        var result = new StringBuilder();
-        for ( int y = 0; y < imageBuffer.Height; y++ )
+        var rows = new string[imageBuffer.Height];
+        Parallel.For(0, imageBuffer.Height, y =>
         {
+            var rowBuilder = new StringBuilder();
             for ( int x = 0; x < imageBuffer.Width; x++ )
             {
                 var pixel = imageBuffer.Pixels[y * imageBuffer.Width + x];
                 byte grayValue = ColorCalculator.ToGrayscale(pixel);
 
-                int index = (int)Math.Round(grayValue / 255.0 * ( ramp.Length - 1 ));
-                result.Append(ramp[index]);
+                int index = (int)Math.Round(grayValue / 255.0 * ( asciiChars.Length - 1 ));
+                rowBuilder.Append(asciiChars[index]);
             }
-            result.AppendLine();
-        }
-        return result.ToString();
+            rows[y] = rowBuilder.ToString();
+        });
+        return string.Join(Environment.NewLine, rows);
     }
 }

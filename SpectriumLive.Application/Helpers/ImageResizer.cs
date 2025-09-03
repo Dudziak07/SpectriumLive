@@ -13,7 +13,7 @@ public class ImageResizer
 
         var resizedPixels = new PixelData[newWidth * newHeight];
 
-        for ( int y = 0; y < newHeight; y++ )
+        Parallel.For(0, newHeight, y =>
         {
             for ( int x = 0; x < newWidth; x++ )
             {
@@ -25,7 +25,7 @@ public class ImageResizer
 
                 resizedPixels[y * newWidth + x] = source.Pixels[sourceY * source.Width + sourceX];
             }
-        }
+        });
         return new(newWidth, newHeight, resizedPixels);
     }
 }

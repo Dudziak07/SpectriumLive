@@ -16,7 +16,7 @@ public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( var i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
@@ -27,6 +27,6 @@ public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
                 SwapMode.GB => new PixelData(pixel.R, pixel.B, pixel.G, pixel.A),
                 _ => pixel
             };
-        }
+        });
     }
 }
