@@ -19,7 +19,7 @@ public abstract class ConvolutionFilterBase : IFilter
         int kernelSize = Kernel.GetLength(0);
         int kernelOffset = kernelSize / 2;
 
-        for ( int y = kernelOffset; y < height - kernelOffset; y++ )
+        Parallel.For(kernelOffset, height - kernelOffset, y =>
         {
             for ( int x = kernelOffset; x < width - kernelOffset; x++ )
             {
@@ -54,6 +54,6 @@ public abstract class ConvolutionFilterBase : IFilter
 
                 destinationPixels[y * width + x] = new PixelData(finalR, finalG, finalB, sourcePixels[y * width + x].A);
             }
-        }
+        });
     }
 }

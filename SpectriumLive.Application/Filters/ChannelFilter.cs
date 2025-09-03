@@ -16,7 +16,7 @@ public class ChannelFilter(string name, ChannelSelector channelSelector) : IFilt
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( var i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
@@ -27,6 +27,6 @@ public class ChannelFilter(string name, ChannelSelector channelSelector) : IFilt
                 ChannelSelector.B => new PixelData(0, 0, pixel.B, pixel.A),
                 _ => pixel
             };
-        }
+        });
     }
 }

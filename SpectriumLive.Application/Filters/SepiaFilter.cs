@@ -8,7 +8,7 @@ public class SepiaFilter : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( int i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
@@ -21,6 +21,6 @@ public class SepiaFilter : IFilter
             byte finalB = (byte)Math.Min(255, newB);
 
             imageBuffer.Pixels[i] = new(finalR, finalG, finalB, pixel.A);
-        }
+        });
     }
 }

@@ -10,7 +10,7 @@ public class BinaryFilter : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( int i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
@@ -20,6 +20,6 @@ public class BinaryFilter : IFilter
                 : (byte)255;
 
             imageBuffer.Pixels[i] = new(finalValue, finalValue, finalValue, pixel.A);
-        }
+        });
     }
 }

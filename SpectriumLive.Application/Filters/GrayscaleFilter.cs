@@ -9,13 +9,13 @@ public class GrayscaleFilter : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        for ( int i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, imageBuffer.Pixels.Length, i =>
         {
             var pixel = imageBuffer.Pixels[i];
 
             byte grayByte = ColorCalculator.ToGrayscale(pixel);
 
             imageBuffer.Pixels[i] = new(grayByte, grayByte, grayByte, pixel.A);
-        }
+        });
     }
 }
