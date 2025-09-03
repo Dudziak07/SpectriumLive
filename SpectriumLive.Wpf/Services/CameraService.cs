@@ -1,15 +1,14 @@
 ﻿using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
 using System.Collections.ObjectModel;
-using System.Windows.Media.Imaging;
 
 namespace SpectriumLive.Wpf.Services;
 public class CameraService
 {
     private VideoCapture? videoCapture;
     private CancellationTokenSource? cancellationTokenSource;
+    private Task? cameraTask;
 
-    public ObservableCollection<string> GetAvailableCameras()
+    public static ObservableCollection<string> GetAvailableCameras()
     {
         var cameras = new ObservableCollection<string>();
 
@@ -30,7 +29,7 @@ public class CameraService
         return cameras;
     }
 
-    public void StartCamera(int cameraIndex, Action<BitmapSource> onNewFrame)
+    public void StartCamera(int cameraIndex, Action<Mat> onNewFrame)
     {
         StopCamera();
         videoCapture = new VideoCapture(cameraIndex);
@@ -44,7 +43,7 @@ public class CameraService
         cancellationTokenSource = new CancellationTokenSource();
         var token = cancellationTokenSource.Token;
 
-        Task.Run(async () =>
+        cameraTask = Task.Run(async () =>
         {
             using var frame = new Mat();
 
@@ -54,12 +53,9 @@ public class CameraService
 
                 if ( !frame.Empty() )
                 {
-                    var bitmapSource = frame.ToBitmapSource();
-                    bitmapSource.Freeze();
-
-                    App.Current.Dispatcher.Invoke(() => onNewFrame(bitmapSource));
+                    App.Current.Dispatcher.Invoke(() => onNewFrame(frame));
                 }
-                await Task.Delay(33, token);
+                await Task.Delay(16, token);
             }
         }, token);
     }
@@ -67,10 +63,18 @@ public class CameraService
     public void StopCamera()
     {
         cancellationTokenSource?.Cancel();
+
+        try
+        {
+            cameraTask?.Wait(500);
+        }
+        catch ( OperationCanceledException ) { }
+
         cancellationTokenSource?.Dispose();
         cancellationTokenSource = null;
         videoCapture?.Release();
         videoCapture?.Dispose();
         videoCapture = null;
+        cameraTask = null;
     }
 }
