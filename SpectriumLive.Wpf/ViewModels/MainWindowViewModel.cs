@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using OpenCvSharp;
+using OpenCvSharp.WpfExtensions;
 using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
@@ -27,8 +29,8 @@ public partial class MainWindowViewModel(
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
 
     public IEnumerable<IFilter> Filters { get; } = FilterService.GetAvailableFilters();
-    public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
-    public ObservableCollection<string> AvailableCameras { get; } = cameraService.GetAvailableCameras();
+    public IEnumerable<IImageToTextConverter> TextConverters { get; } = TextConverterService.GetAvailableConverters();
+    public ObservableCollection<string> AvailableCameras { get; } = CameraService.GetAvailableCameras();
 
     [ObservableProperty]
     private ImageSource? originalImage;
@@ -49,6 +51,8 @@ public partial class MainWindowViewModel(
     private int selectedCameraIndex = -1;
 
     private ImageBuffer? originalImageBuffer;
+
+    private WriteableBitmap? cameraFrameBitmap;
 
     [RelayCommand]
     private void LoadImage()
@@ -102,7 +106,12 @@ public partial class MainWindowViewModel(
     private void StartCamera()
     {
         if ( SelectedCameraIndex >= 0 )
+        {
+            OriginalImage = null;
+            ProcessedImage = null;
+            cameraFrameBitmap = null;
             cameraService.StartCamera(SelectedCameraIndex, OnNewCameraFrame);
+        }
     }
 
     [RelayCommand]
@@ -111,10 +120,18 @@ public partial class MainWindowViewModel(
         cameraService.StopCamera();
     }
 
-    private void OnNewCameraFrame(BitmapSource frame)
+    private void OnNewCameraFrame(Mat frame)
     {
-        OriginalImage = frame;
-        originalImageBuffer = ImageConverter.ToImageBuffer(frame);
+        if ( cameraFrameBitmap is null ||
+            cameraFrameBitmap.PixelWidth != frame.Width ||
+            cameraFrameBitmap.PixelHeight != frame.Height )
+        {
+            cameraFrameBitmap = new WriteableBitmap(frame.Width, frame.Height, 96, 96, PixelFormats.Bgr24, null);
+            OriginalImage = cameraFrameBitmap;
+        }
+        WriteableBitmapConverter.ToWriteableBitmap(frame, cameraFrameBitmap);
+
+        originalImageBuffer = ImageConverter.ToImageBuffer(cameraFrameBitmap);
         ProcessImage();
         ConvertImageToText();
     }

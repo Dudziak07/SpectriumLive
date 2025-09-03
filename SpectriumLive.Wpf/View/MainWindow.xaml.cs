@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Wpf.ViewModels;
+using System.ComponentModel;
 using System.Windows;
 
 namespace SpectriumLive.Wpf.View;
@@ -12,5 +13,18 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = mainWindowViewModel;
+
+        Closing += MainWindow_Closing;
+    }
+
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        if ( DataContext is MainWindowViewModel viewModel )
+        {
+            if ( viewModel.StopCameraCommand.CanExecute(viewModel) )
+            {
+                viewModel.StopCameraCommand.Execute(null);
+            }
+        }
     }
 }
