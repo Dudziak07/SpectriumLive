@@ -127,4 +127,5 @@ public partial class MainWindowViewModel(
 
     partial void OnSelectedFilterChanged(IFilter? value) => ProcessImage();
     partial void OnSelectedTextConverterChanged(IImageToTextConverter? value) => ConvertImageToText();
+    partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
 }
