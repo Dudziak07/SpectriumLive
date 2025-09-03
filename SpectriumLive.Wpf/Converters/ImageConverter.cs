@@ -8,24 +8,32 @@ public static class ImageConverter
 {
     public static ImageBuffer ToImageBuffer(BitmapSource bitmap)
     {
-        var format = PixelFormats.Bgra32;
-        var stride = bitmap.PixelWidth * ( format.BitsPerPixel / 8 );
-        var pixelBytes = new byte[bitmap.PixelHeight * stride];
-        bitmap.CopyPixels(pixelBytes, stride, 0);
+        var formattedBitmap = new FormatConvertedBitmap(
+            bitmap,
+            PixelFormats.Bgra32,
+            null,
+            0);
+        var stride = ( formattedBitmap.PixelWidth * formattedBitmap.Format.BitsPerPixel + 7 ) / 8;
+        var pixelBytes = new byte[formattedBitmap.PixelHeight * stride];
+        formattedBitmap.CopyPixels(pixelBytes, stride, 0);
 
-        var pixels = new PixelData[bitmap.PixelWidth * bitmap.PixelHeight];
-        for ( int i = 0; i < pixels.Length; i++ )
+        var pixels = new PixelData[formattedBitmap.PixelWidth * formattedBitmap.PixelHeight];
+        for ( int y = 0; y < formattedBitmap.PixelHeight; y++ )
         {
-            int byteIndex = i * 4;
-            pixels[i] = new(
-                pixelBytes[byteIndex + 2], // R
-                pixelBytes[byteIndex + 1], // G
-                pixelBytes[byteIndex + 0], // B
-                pixelBytes[byteIndex + 3]  // A
-            );
+            for ( int x = 0; x < formattedBitmap.PixelWidth; x++ )
+            {
+                int pixelIndex = y * formattedBitmap.PixelWidth + x;
+                int byteIndex = y * stride + x * 4;
+                pixels[pixelIndex] = new(
+                    pixelBytes[byteIndex + 2], // R
+                    pixelBytes[byteIndex + 1], // G
+                    pixelBytes[byteIndex + 0], // B
+                    pixelBytes[byteIndex + 3]  // A
+                );
+            }
         }
 
-        return new ImageBuffer(bitmap.PixelWidth, bitmap.PixelHeight, pixels);
+        return new ImageBuffer(formattedBitmap.PixelWidth, formattedBitmap.PixelHeight, pixels);
     }
 
     public static ImageSource ToImageSource(ImageBuffer imageBuffer)
