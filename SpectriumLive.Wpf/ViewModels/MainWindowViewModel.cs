@@ -109,7 +109,6 @@ public partial class MainWindowViewModel(
     private void StopCamera()
     {
         cameraService.StopCamera();
-        OriginalImage = null;
     }
 
     private void OnNewCameraFrame(BitmapSource frame)
