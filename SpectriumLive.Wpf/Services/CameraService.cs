@@ -64,7 +64,14 @@ public class CameraService
         {
             cameraTask?.Wait(500);
         }
-        catch ( OperationCanceledException ) { }
+        catch ( OperationCanceledException )
+        {
+        }
+        catch ( AggregateException ex ) when ( ex.InnerExceptions
+            .OfType<TaskCanceledException>()
+            .Any() )
+        {
+        }
 
         cancellationTokenSource?.Dispose();
         cancellationTokenSource = null;
