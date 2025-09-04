@@ -1,6 +1,6 @@
 ﻿using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.TextConverters;
-using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 using Xunit;
 
 namespace SpectriumLive.Application.Tests.TextConverters;

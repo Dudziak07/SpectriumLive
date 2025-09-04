@@ -6,6 +6,7 @@ using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.ViewModels.Base;
@@ -28,9 +29,9 @@ public partial class MainWindowViewModel(
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
 
-    public IEnumerable<IFilter> Filters { get; } = FilterService.GetAvailableFilters();
-    public IEnumerable<IImageToTextConverter> TextConverters { get; } = TextConverterService.GetAvailableConverters();
-    public ObservableCollection<string> AvailableCameras { get; } = CameraService.GetAvailableCameras();
+    public IEnumerable<IFilter> Filters { get; } = filterService.GetAvailableFilters();
+    public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
+    public ObservableCollection<CameraDevice> AvailableCameras { get; } = new();
 
     [ObservableProperty]
     private ImageSource? originalImage;
@@ -49,6 +50,10 @@ public partial class MainWindowViewModel(
 
     [ObservableProperty]
     private int selectedCameraIndex = -1;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoadCamerasCommand))]
+    private bool isScanningCameras;
 
     private ImageBuffer? originalImageBuffer;
 
@@ -101,6 +106,28 @@ public partial class MainWindowViewModel(
         var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
         AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
     }
+
+    [RelayCommand(CanExecute = nameof(CanLoadCameras))]
+    private async Task LoadCamerasAsync()
+    {
+        IsScanningCameras = true;
+        AvailableCameras.Clear();
+
+        try
+        {
+            var availableCameras = await cameraService.GetAvailableCamerasAsync();
+            foreach ( var camera in availableCameras )
+            {
+                AvailableCameras.Add(camera);
+            }
+        }
+        finally
+        {
+            IsScanningCameras = false;
+        }
+    }
+
+    private bool CanLoadCameras() => !IsScanningCameras;
 
     [RelayCommand]
     private void StartCamera()

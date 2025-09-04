@@ -1,4 +1,6 @@
-﻿using OpenCvSharp;
+﻿using AForge.Video.DirectShow;
+using OpenCvSharp;
+using SpectriumLive.Core.Entities;
 using System.Collections.ObjectModel;
 
 namespace SpectriumLive.Wpf.Services;
@@ -8,25 +10,19 @@ public class CameraService
     private CancellationTokenSource? cancellationTokenSource;
     private Task? cameraTask;
 
-    public static ObservableCollection<string> GetAvailableCameras()
+    public Task<ObservableCollection<CameraDevice>> GetAvailableCamerasAsync()
     {
-        var cameras = new ObservableCollection<string>();
-
-        for ( int i = 0; i < 10; i++ )
+        return Task.Run(() =>
         {
-            var cap = new VideoCapture(i);
+            var cameras = new ObservableCollection<CameraDevice>();
+            var videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
-            if ( cap.IsOpened() )
+            for ( int i = 0; i < videoDevices.Count; i++ )
             {
-                cameras.Add($"Camera {i}");
-                cap.Release();
+                cameras.Add(new CameraDevice(i, videoDevices[i].Name));
             }
-            else
-            {
-                break;
-            }
-        }
-        return cameras;
+            return cameras;
+        });
     }
 
     public void StartCamera(int cameraIndex, Action<Mat> onNewFrame)

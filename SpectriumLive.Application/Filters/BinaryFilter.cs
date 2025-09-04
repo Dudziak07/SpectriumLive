@@ -1,5 +1,6 @@
 ﻿using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Filters;
 

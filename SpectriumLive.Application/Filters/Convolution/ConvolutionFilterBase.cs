@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Filters.Convolution;
 public abstract class ConvolutionFilterBase : IFilter
