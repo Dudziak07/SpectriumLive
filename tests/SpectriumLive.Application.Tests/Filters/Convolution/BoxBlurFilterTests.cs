@@ -1,5 +1,5 @@
 ﻿using SpectriumLive.Application.Filters.Convolution;
-using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 using Xunit;
 
 namespace SpectriumLive.Application.Tests.Filters.Convolution;

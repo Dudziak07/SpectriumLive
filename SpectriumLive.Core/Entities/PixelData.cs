@@ -1,4 +1,4 @@
-﻿namespace SpectriumLive.Core;
+﻿namespace SpectriumLive.Core.Entities;
 
 public class PixelData(byte r, byte g, byte b, byte a)
 {

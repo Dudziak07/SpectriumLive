@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Core;
+﻿using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Helpers;
 public class ImageResizer

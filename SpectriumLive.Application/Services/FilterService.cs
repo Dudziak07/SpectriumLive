@@ -6,7 +6,7 @@ namespace SpectriumLive.Application.Services;
 
 public class FilterService
 {
-    public static IEnumerable<IFilter> GetAvailableFilters()
+    public IEnumerable<IFilter> GetAvailableFilters()
     {
         yield return new BinaryFilter();
         yield return new GrayscaleFilter();

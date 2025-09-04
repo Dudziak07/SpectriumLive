@@ -1,4 +1,4 @@
-﻿namespace SpectriumLive.Core;
+﻿namespace SpectriumLive.Core.Entities;
 
 public class ImageBuffer(int width, int height, PixelData[] pixels)
 {

@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Core;
+﻿using SpectriumLive.Core.Entities;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 

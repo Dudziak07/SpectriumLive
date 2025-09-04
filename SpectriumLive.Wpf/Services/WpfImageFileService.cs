@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 using SpectriumLive.Application.Contracts;
-using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
 using SpectriumLive.Wpf.Converters;
 using System.IO;
 using System.Windows.Media.Imaging;
