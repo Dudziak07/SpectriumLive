@@ -31,7 +31,7 @@ public partial class MainWindowViewModel(
 
     public IEnumerable<IFilter> Filters { get; } = filterService.GetAvailableFilters();
     public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
-    public ObservableCollection<CameraDevice> AvailableCameras { get; } = new();
+    public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
 
     [ObservableProperty]
     private ImageSource? originalImage;
