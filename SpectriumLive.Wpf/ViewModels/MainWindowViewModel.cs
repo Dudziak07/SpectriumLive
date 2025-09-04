@@ -8,6 +8,7 @@ using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 using SpectriumLive.Wpf.Converters;
+using SpectriumLive.Wpf.Resources.Strings;
 using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.ViewModels.Base;
 using System.Collections.ObjectModel;
@@ -32,6 +33,7 @@ public partial class MainWindowViewModel(
     public IEnumerable<IFilter> Filters { get; } = filterService.GetAvailableFilters();
     public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
     public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
+    public LocalizedStrings Locale { get; } = new();
 
     [ObservableProperty]
     private ImageSource? originalImage;
