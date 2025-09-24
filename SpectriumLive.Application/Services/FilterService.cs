@@ -12,8 +12,8 @@ public class FilterService
         yield return new GrayscaleFilter();
         yield return new NegativeFilter();
         yield return new SepiaFilter();
-        yield return new FisheyeFilter(1.0);
-        yield return new FisheyeFilter(-1.0);
+        yield return new FisheyeFilter(1.0); // Fisheye
+        yield return new FisheyeFilter(-1.0); // Defisheye
 
         yield return new SwapChannelsFilter("Swap Channels (Red-Blue)", SwapMode.RB);
         yield return new SwapChannelsFilter("Swap Channels (Red-Green)", SwapMode.RG);
