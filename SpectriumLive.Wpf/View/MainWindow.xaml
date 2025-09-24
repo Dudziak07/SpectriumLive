@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:res="clr-namespace:SpectriumLive.Wpf.Resources.Strings"
         xmlns:local="clr-namespace:SpectriumLive.Wpf"
         mc:Ignorable="d"
         Title="SpectriumLive" Height="600" Width="800">
@@ -46,8 +47,8 @@
             </Grid>
             
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,10">
-                <Button Content="{Binding Locale.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
-                <Button Content="{Binding Locale.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
+                <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
+                <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
             </StackPanel>
 
             <Label
