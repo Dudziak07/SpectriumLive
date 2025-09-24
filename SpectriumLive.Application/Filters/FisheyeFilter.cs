@@ -2,9 +2,9 @@
 using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Filters;
-public class FisheyeFilter : IFilter
+public class FisheyeFilter(double strength = 1.0) : IFilter
 {
-    public string Name => "Fisheye";
+    public string Name => strength >= 0 ? "Fisheye" : "Defisheye";
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -30,7 +30,9 @@ public class FisheyeFilter : IFilter
                 {
                     double theta = Math.Atan2(dy, dx);
 
-                    double newR = Math.Pow(r, 2);
+                    double newR = strength >= 0
+                        ? Math.Pow(r, 1 + strength)
+                        : Math.Pow(r, 1.0 / ( 1 - strength ));
 
                     double srcX = centerX + newR * radius * Math.Cos(theta);
                     double srcY = centerY + newR * radius * Math.Sin(theta);
