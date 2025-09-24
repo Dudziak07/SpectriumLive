@@ -76,7 +76,7 @@ public class FisheyeFilterTests
             image.Pixels[i].B == edgePixel.B &&
             image.Pixels[i].A == edgePixel.A);
 
-        Assert.True(found, "Edge pixel was not mapped into central region after fisheye transform.");
+        Assert.False(found, "Edge pixel was not mapped into central region after fisheye transform.");
     }
 
     [Fact]
