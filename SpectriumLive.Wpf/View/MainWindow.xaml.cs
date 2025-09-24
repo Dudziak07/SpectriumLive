@@ -21,7 +21,7 @@ public partial class MainWindow : Window
     {
         if ( DataContext is MainWindowViewModel viewModel )
         {
-            if ( viewModel.StopCameraCommand.CanExecute(viewModel) )
+            if ( viewModel.StopCameraCommand.CanExecute(null) )
             {
                 viewModel.StopCameraCommand.Execute(null);
             }
