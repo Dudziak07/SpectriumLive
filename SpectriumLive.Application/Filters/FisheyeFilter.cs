@@ -10,10 +10,12 @@ public class FisheyeFilter : IFilter
     {
         int width = imageBuffer.Width;
         int height = imageBuffer.Height;
-        var originalPixels = (PixelData[])imageBuffer.Pixels.Clone();
 
-        double centerX = width / 2.0;
-        double centerY = height / 2.0;
+        var source = (PixelData[])imageBuffer.Pixels.Clone();
+        var destination = new PixelData[width * height];
+
+        double centerX = ( width - 1 ) / 2.0;
+        double centerY = ( height - 1 ) / 2.0;
         double radius = Math.Min(centerX, centerY);
 
         Parallel.For(0, height, y =>
@@ -24,25 +26,31 @@ public class FisheyeFilter : IFilter
                 double dy = ( y - centerY ) / radius;
                 double r = Math.Sqrt(dx * dx + dy * dy);
 
-                if ( r <= 1.0 )
+                if ( r < 1.0 )
                 {
                     double theta = Math.Atan2(dy, dx);
 
-                    double newR = Math.Pow(r, 2);
+                    double newR = r * r;
 
                     double srcX = centerX + newR * radius * Math.Cos(theta);
                     double srcY = centerY + newR * radius * Math.Sin(theta);
 
-                    int ix = (int)Math.Clamp(srcX, 0, width - 1);
-                    int iy = (int)Math.Clamp(srcY, 0, height - 1);
+                    int ix = (int)Math.Clamp((int)Math.Round(srcX), 0, width - 1);
+                    int iy = (int)Math.Clamp((int)Math.Round(srcY), 0, height - 1);
 
-                    imageBuffer.Pixels[y * width + x] = originalPixels[iy * width + ix];
+                    destination[y * width + x] = source[iy * width + ix];
                 }
                 else
                 {
-                    imageBuffer.Pixels[y * width + x] = new PixelData(0, 0, 0, 255);
+                    destination[y * width + x] = new PixelData(0, 0, 0, 255);
                 }
             }
         });
+
+        var target = imageBuffer.Pixels;
+        for ( int i = 0; i < destination.Length; i++ )
+        {
+            target[i] = destination[i];
+        }
     }
 }
