@@ -78,4 +78,38 @@ public class FisheyeFilterTests
 
         Assert.True(found, "Edge pixel was not mapped into central region after fisheye transform.");
     }
+
+    [Fact]
+    public void CornerR_ShouldBeGreaterThanOne()
+    {
+        // Arrange
+        int w = 5, h = 5;
+        double cx = ( w - 1 ) / 2.0;
+        double cy = ( h - 1 ) / 2.0;
+        double radius = Math.Min(cx, cy);
+
+        // Act
+        double dx = ( 0 - cx ) / radius;
+        double dy = ( 0 - cy ) / radius;
+        double r = Math.Sqrt(dx * dx + dy * dy);
+
+        // Assert
+        Assert.True(r > 1.0, $"r for corner = {r} (expected > 1)");
+    }
+
+    [Fact]
+    public void PixelsGetter_ReturnsReference_NotCopy()
+    {
+        // Arrange
+        var pixels = Enumerable.Repeat(new PixelData(10, 20, 30, 255), 25).ToArray();
+        var image = new ImageBuffer(5, 5, pixels);
+
+        // Act
+        var arr = image.Pixels;
+        arr[0] = new PixelData(1, 2, 3, 4);
+
+        // Assert
+        var arr2 = image.Pixels;
+        Assert.Equal(1, arr2[0].R);
+    }
 }

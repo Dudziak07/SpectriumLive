@@ -30,7 +30,7 @@ public class FisheyeFilter : IFilter
                 {
                     double theta = Math.Atan2(dy, dx);
 
-                    double newR = r * r;
+                    double newR = Math.Sqrt(r);
 
                     double srcX = centerX + newR * radius * Math.Cos(theta);
                     double srcY = centerY + newR * radius * Math.Sin(theta);
