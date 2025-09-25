@@ -88,6 +88,42 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Theme.
+        /// </summary>
+        public static string MenuTheme_Header {
+            get {
+                return ResourceManager.GetString("MenuTheme_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Dark.
+        /// </summary>
+        public static string MenuThemeDark_Header {
+            get {
+                return ResourceManager.GetString("MenuThemeDark_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Light.
+        /// </summary>
+        public static string MenuThemeLight_Header {
+            get {
+                return ResourceManager.GetString("MenuThemeLight_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _View.
+        /// </summary>
+        public static string MenuView_Header {
+            get {
+                return ResourceManager.GetString("MenuView_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save Image.
         /// </summary>
         public static string SaveImageButton_Content {

@@ -24,15 +24,19 @@ public partial class App : System.Windows.Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Register your services here
-        services.AddSingleton<FilterService>();
-        services.AddSingleton<TextConverterService>();
-        services.AddSingleton<IImageFileService, WpfImageFileService>();
-        services.AddSingleton<MainWindowViewModel>();
+        services
+            // Services
+            .AddSingleton<FilterService>()
+            .AddSingleton<TextConverterService>()
+            .AddSingleton<CameraService>()
+            .AddSingleton<ThemeService>()
+            .AddSingleton<IImageFileService, WpfImageFileService>()
 
-        // Add other services as needed
-        services.AddSingleton<CameraService>();
-        services.AddSingleton<MainWindow>();
+            // ViewModels
+            .AddSingleton<MainWindowViewModel>()
+
+            // Views
+            .AddSingleton<MainWindow>();
     }
 
     protected override void OnStartup(StartupEventArgs e)

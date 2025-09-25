@@ -8,88 +8,19 @@
         xmlns:local="clr-namespace:SpectriumLive.Wpf"
         mc:Ignorable="d"
         Title="SpectriumLive" Height="600" Width="800">
-    <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <Button
-                Content="Load Image"
-                Margin="0,0,0,10"
-                Command="{Binding LoadImageCommand}"/>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="{x:Static res:AppResources.MenuView_Header}">
+                <MenuItem Header="{x:Static res:AppResources.MenuTheme_Header}">
+                    <MenuItem Header="{x:Static res:AppResources.MenuThemeLight_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Light"/>
+                    <MenuItem Header="{x:Static res:AppResources.MenuThemeDark_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Dark"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
 
-            <Label Content="Live Camera:"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5"/>
 
-                <ComboBox Grid.Column="0"
-                          ItemsSource="{Binding AvailableCameras}"
-                          SelectedIndex="{Binding SelectedCameraIndex}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="DropDownOpened">
-                            <i:InvokeCommandAction Command="{Binding LoadCamerasCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ComboBox>
-
-                <Button Grid.Column="1"
-                        Content="⟳"
-                        Command="{Binding LoadCamerasCommand}"
-                        ToolTip="Refresh camera list"
-                        Margin="5"
-                        Padding="5,2"/>
-            </Grid>
-            
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,10">
-                <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
-                <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
-            </StackPanel>
-
-            <Label
-                Content="Available Filters:"/>
-            <ListBox
-                ItemsSource="{Binding Filters}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectedFilter}"/>
-            
-            <Label
-                Content="Text Convertets:"/>
-            <ListBox
-                ItemsSource="{Binding TextConverters}"
-                DisplayMemberPath="Name"
-                SelectedItem="{Binding SelectedTextConverter}"/>
-
-            <Button
-                Content="Save Image"
-                Margin="0,10,0,0"
-                Command="{Binding SaveImageCommand}"/>
-
-        </StackPanel>
-
-        <Grid Grid.Column="1" Margin="10,0,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0" Margin="5">
-                <Image x:Name="OriginalImage" Source="{Binding OriginalImage}"/>
-            </Border>
-
-            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="1" Margin="5">
-                <Image x:Name="ProcessedImage" Source="{Binding ProcessedImage}"/>
-            </Border>
-
-            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="2" Margin="5">
-                <TextBox Text="{Binding AsciiResult}" FontFamily="Consolas" FontSize="4" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap"/>
-            </Border>
-        </Grid>
-    </Grid>
+        <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5"/>
+    </DockPanel>
 </Window>

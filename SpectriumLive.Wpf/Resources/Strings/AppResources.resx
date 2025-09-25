@@ -126,6 +126,18 @@
   <data name="LoadImageButton_Content" xml:space="preserve">
     <value>Load Image</value>
   </data>
+  <data name="MenuThemeDark_Header" xml:space="preserve">
+    <value>_Dark</value>
+  </data>
+  <data name="MenuThemeLight_Header" xml:space="preserve">
+    <value>_Light</value>
+  </data>
+  <data name="MenuTheme_Header" xml:space="preserve">
+    <value>_Theme</value>
+  </data>
+  <data name="MenuView_Header" xml:space="preserve">
+    <value>_View</value>
+  </data>
   <data name="SaveImageButton_Content" xml:space="preserve">
     <value>Save Image</value>
   </data>

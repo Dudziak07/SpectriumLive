@@ -20,7 +20,8 @@ public partial class MainWindowViewModel(
     FilterService filterService,
     IImageFileService imageFileService,
     TextConverterService textConverterService,
-    CameraService cameraService) : ViewModelBase
+    CameraService cameraService,
+    ThemeService themeService) : ViewModelBase
 {
     private readonly FilterService filterService = filterService;
     private readonly TextConverterService textConverterService = textConverterService;
@@ -58,6 +59,18 @@ public partial class MainWindowViewModel(
     private ImageBuffer? originalImageBuffer;
 
     private WriteableBitmap? cameraFrameBitmap;
+
+    [RelayCommand]
+    private void SetTheme(string themeName)
+    {
+        var theme = themeName.ToLower() switch
+        {
+            "light" => Theme.Light,
+            _ => Theme.Dark
+        };
+
+        themeService.SwitchTheme(theme);
+    }
 
     [RelayCommand]
     private void LoadImage()
