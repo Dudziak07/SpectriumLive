@@ -11,10 +11,10 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_View">
-                <MenuItem Header="_Theme">
-                    <MenuItem Header="_Light" Command="{Binding SetThemeCommand}" CommandParameter="Light"/>
-                    <MenuItem Header="_Dark" Command="{Binding SetThemeCommand}" CommandParameter="Dark"/>
+            <MenuItem Header="{x:Static res:AppResources.MenuView_Header}">
+                <MenuItem Header="{x:Static res:AppResources.MenuTheme_Header}">
+                    <MenuItem Header="{x:Static res:AppResources.MenuThemeLight_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Light"/>
+                    <MenuItem Header="{x:Static res:AppResources.MenuThemeDark_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Dark"/>
                 </MenuItem>
             </MenuItem>
         </Menu>

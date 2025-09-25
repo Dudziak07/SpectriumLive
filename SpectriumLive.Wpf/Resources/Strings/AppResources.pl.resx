@@ -126,6 +126,18 @@
   <data name="LoadImageButton_Content" xml:space="preserve">
     <value>Wczytaj obraz</value>
   </data>
+  <data name="MenuThemeDark_Header" xml:space="preserve">
+    <value>_Ciemny</value>
+  </data>
+  <data name="MenuThemeLight_Header" xml:space="preserve">
+    <value>_Jasny</value>
+  </data>
+  <data name="MenuTheme_Header" xml:space="preserve">
+    <value>_Motyw</value>
+  </data>
+  <data name="MenuView_Header" xml:space="preserve">
+    <value>_Widok</value>
+  </data>
   <data name="SaveImageButton_Content" xml:space="preserve">
     <value>Zapisz obraz</value>
   </data>
