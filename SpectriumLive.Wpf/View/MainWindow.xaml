@@ -29,7 +29,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryBackgroundColor}" Margin="0,0,0,10">
+                    <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
                         <StackPanel Margin="5">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -52,11 +52,11 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <GroupBox Header="{x:Static res:AppResources.ImageFilters_Header}" Foreground="{DynamicResource PrimaryBackgroundColor}" Margin="0,0,0,10">
+                    <GroupBox Header="{x:Static res:AppResources.ImageFilters_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
                         <ListBox ItemsSource="{Binding Filters}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedFilter}" MaxHeight="250"/>
                     </GroupBox>
 
-                    <GroupBox Header="{x:Static res:AppResources.TextConverters_Header}" Foreground="{DynamicResource PrimaryBackgroundColor}" Margin="0,0,0,10">
+                    <GroupBox Header="{x:Static res:AppResources.TextConverters_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
                         <ListBox ItemsSource="{Binding TextConverters}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTextConverter}" MaxHeight="150"/>
                     </GroupBox>
                 </StackPanel>
