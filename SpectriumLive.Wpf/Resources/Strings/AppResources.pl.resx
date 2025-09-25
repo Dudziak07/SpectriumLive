@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="File_Header" xml:space="preserve">
+    <value>Plik</value>
+  </data>
   <data name="FreezeButton_Content" xml:space="preserve">
     <value>Zamroź</value>
+  </data>
+  <data name="ImageFilters_Header" xml:space="preserve">
+    <value>Filtry obrazu</value>
   </data>
   <data name="LiveCamera_Header" xml:space="preserve">
     <value>Kamera na żywo</value>
@@ -146,5 +152,8 @@
   </data>
   <data name="StopButton_Content" xml:space="preserve">
     <value>Stop</value>
+  </data>
+  <data name="TextConverters_Header" xml:space="preserve">
+    <value>Konwertery tekstu</value>
   </data>
 </root>

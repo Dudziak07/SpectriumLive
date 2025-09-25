@@ -61,11 +61,29 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File.
+        /// </summary>
+        public static string File_Header {
+            get {
+                return ResourceManager.GetString("File_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Freeze.
         /// </summary>
         public static string FreezeButton_Content {
             get {
                 return ResourceManager.GetString("FreezeButton_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image Filters.
+        /// </summary>
+        public static string ImageFilters_Header {
+            get {
+                return ResourceManager.GetString("ImageFilters_Header", resourceCulture);
             }
         }
         
@@ -147,6 +165,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         public static string StopButton_Content {
             get {
                 return ResourceManager.GetString("StopButton_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text Converters.
+        /// </summary>
+        public static string TextConverters_Header {
+            get {
+                return ResourceManager.GetString("TextConverters_Header", resourceCulture);
             }
         }
     }
