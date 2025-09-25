@@ -8,7 +8,7 @@ public abstract class ConvolutionFilterBase : IFilter
     protected abstract double[,] Kernel { get; }
     protected virtual double Factor { get; } = 1.0;
     protected virtual double Bias { get; } = 0.0;
-    protected virtual bool UseAbsoulteValue { get; } = false;
+    protected virtual bool UseAbsoluteValue { get; } = false;
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -42,7 +42,7 @@ public abstract class ConvolutionFilterBase : IFilter
                     }
                 }
 
-                if ( UseAbsoulteValue )
+                if ( UseAbsoluteValue )
                 {
                     sumR = Math.Abs(sumR);
                     sumG = Math.Abs(sumG);

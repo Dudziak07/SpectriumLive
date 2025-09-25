@@ -8,5 +8,5 @@ public class EdgeDetectionFilter : ConvolutionFilterBase
         { -1, 8, -1 },
         { -1, -1, -1 }
     };
-    protected override bool UseAbsoulteValue => true;
+    protected override bool UseAbsoluteValue => true;
 }

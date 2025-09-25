@@ -24,6 +24,6 @@ public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConver
             }
             rows[y] = rowBuilder.ToString();
         });
-        return string.Join(Environment.NewLine, rows);
+        return string.Join(Environment.NewLine, rows) + Environment.NewLine;
     }
 }

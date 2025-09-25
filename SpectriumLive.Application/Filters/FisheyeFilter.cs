@@ -1,0 +1,58 @@
+﻿using SpectriumLive.Core;
+using SpectriumLive.Core.Entities;
+
+namespace SpectriumLive.Application.Filters;
+public class FisheyeFilter(double strength = 1.0) : IFilter
+{
+    public string Name => strength >= 0 ? "Fisheye" : "Defisheye";
+
+    public void Apply(ImageBuffer imageBuffer)
+    {
+        int width = imageBuffer.Width;
+        int height = imageBuffer.Height;
+
+        var source = (PixelData[])imageBuffer.Pixels.Clone();
+        var destination = new PixelData[width * height];
+
+        double centerX = ( width - 1 ) / 2.0;
+        double centerY = ( height - 1 ) / 2.0;
+        double radius = Math.Min(centerX, centerY);
+
+        Parallel.For(0, height, y =>
+        {
+            for ( int x = 0; x < width; x++ )
+            {
+                double dx = ( x - centerX ) / radius;
+                double dy = ( y - centerY ) / radius;
+                double r = Math.Sqrt(dx * dx + dy * dy);
+
+                if ( r < 1.0 )
+                {
+                    double theta = Math.Atan2(dy, dx);
+
+                    double newR = strength >= 0
+                        ? Math.Pow(r, 1 + strength)
+                        : Math.Pow(r, 1.0 / ( 1 - strength ));
+
+                    double srcX = centerX + newR * radius * Math.Cos(theta);
+                    double srcY = centerY + newR * radius * Math.Sin(theta);
+
+                    int ix = (int)Math.Clamp((int)Math.Round(srcX), 0, width - 1);
+                    int iy = (int)Math.Clamp((int)Math.Round(srcY), 0, height - 1);
+
+                    destination[y * width + x] = source[iy * width + ix];
+                }
+                else
+                {
+                    destination[y * width + x] = new PixelData(0, 0, 0, 255);
+                }
+            }
+        });
+
+        var target = imageBuffer.Pixels;
+        for ( int i = 0; i < destination.Length; i++ )
+        {
+            target[i] = destination[i];
+        }
+    }
+}
