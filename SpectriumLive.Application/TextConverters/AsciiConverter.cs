@@ -7,6 +7,7 @@ namespace SpectriumLive.Application.TextConverters;
 public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConverter
 {
     public string Name { get; } = name;
+    public string Group => "ASCII";
 
     public string Convert(ImageBuffer imageBuffer)
     {

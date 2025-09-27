@@ -26,8 +26,7 @@ public partial class App : System.Windows.Application
     {
         services
             // Services
-            .AddSingleton<FilterService>()
-            .AddSingleton<TextConverterService>()
+            .AddSingleton<ProcessorService>()
             .AddSingleton<CameraService>()
             .AddSingleton<ThemeService>()
             .AddSingleton<IImageFileService, WpfImageFileService>()

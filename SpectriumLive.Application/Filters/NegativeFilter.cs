@@ -6,6 +6,7 @@ namespace SpectriumLive.Application.Filters;
 public class NegativeFilter : IFilter
 {
     public string Name => "Negative";
+    public string Group => "Color";
 
     public void Apply(ImageBuffer imageBuffer)
     {
