@@ -19,8 +19,62 @@
             </MenuItem>
         </Menu>
 
-        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5"/>
+        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="5">
+                <StackPanel>
+                    <GroupBox Header="{x:Static res:AppResources.File_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <StackPanel Margin="5">
+                            <Button Content="{x:Static res:AppResources.LoadImageButton_Content}" Command="{Binding LoadImageCommand}"/>
+                            <Button Content="{x:Static res:AppResources.SaveImageButton_Content}" Command="{Binding SaveImageCommand}" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </GroupBox>
 
-        <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5"/>
+                    <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <StackPanel Margin="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableCameras}" DisplayMemberPath="Name" SelectedValuePath="Index" SelectedValue="{Binding SelectedCameraIndex}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="DropDownOpened">
+                                            <i:InvokeCommandAction Command="{Binding LoadCamerasCommand}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ComboBox>
+                                <Button Grid.Column="1" Content="⟳" Command="{Binding LoadCamerasCommand}" ToolTip="Refresh camera list" Margin="5,0,0,0" Padding="5,2"/>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
+                                <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="{x:Static res:AppResources.ImageFilters_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <ListBox ItemsSource="{Binding Filters}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedFilter}" MaxHeight="250"/>
+                    </GroupBox>
+
+                    <GroupBox Header="{x:Static res:AppResources.TextConverters_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <ListBox ItemsSource="{Binding TextConverters}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTextConverter}" MaxHeight="150"/>
+                    </GroupBox>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5">
+            <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5">
+                <Image Source="{Binding ProcessedImage}"/>
+            </Border>
+            <Border Width="200" Height="150" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15"
+                    BorderBrush="{DynamicResource BorderColor}" BorderThickness="2" CornerRadius="5">
+                <Image Source="{Binding OriginalImage}"/>
+            </Border>
+            <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5" Visibility="Collapsed">
+                <TextBox Text="{Binding AsciiResult}" FontFamily="Consolas" FontSize="4" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap"
+                         Background="{DynamicResource PrimaryBackgroundColor}" Foreground="{DynamicResource PrimaryForegroundColor}" BorderThickness="0"/>
+            </Border>
+        </Grid>
     </DockPanel>
 </Window>

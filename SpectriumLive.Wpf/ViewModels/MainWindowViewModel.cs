@@ -182,7 +182,25 @@ public partial class MainWindowViewModel(
         ConvertImageToText();
     }
 
-    partial void OnSelectedFilterChanged(IFilter? value) => ProcessImage();
-    partial void OnSelectedTextConverterChanged(IImageToTextConverter? value) => ConvertImageToText();
+    partial void OnSelectedFilterChanged(IFilter? value)
+    {
+        if ( value is not null )
+        {
+            SelectedTextConverter = null;
+        }
+
+        ProcessImage();
+    }
+
+    partial void OnSelectedTextConverterChanged(IImageToTextConverter? value)
+    {
+        if ( value is not null )
+        {
+            SelectedFilter = null;
+        }
+
+        ConvertImageToText();
+    }
+
     partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
 }
