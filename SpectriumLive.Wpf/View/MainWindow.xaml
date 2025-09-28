@@ -65,7 +65,7 @@
 
         <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5">
             <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5">
-                <Image Source="{Binding ProcessedImage}"/>
+                <Image Source="{Binding ProcessedImage}" Stretch="Fill"/>
             </Border>
             <Border Width="200" Height="150" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15"
                     BorderBrush="{DynamicResource BorderColor}" BorderThickness="2" CornerRadius="5">
