@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 using SpectriumLive.Application.Contracts;
-using SpectriumLive.Application.Helpers;
 using SpectriumLive.Application.Services;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
@@ -21,12 +20,15 @@ public partial class MainWindowViewModel(
     IImageFileService imageFileService,
     TextConverterService textConverterService,
     CameraService cameraService,
-    ThemeService themeService) : ViewModelBase
+    ThemeService themeService,
+    TextRendererService textRendererService) : ViewModelBase
 {
     private readonly FilterService filterService = filterService;
     private readonly TextConverterService textConverterService = textConverterService;
     private readonly IImageFileService imageFileService = imageFileService;
     private readonly CameraService cameraService = cameraService;
+    private readonly ThemeService themeService = themeService;
+    private readonly TextRendererService textRendererService = textRendererService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
 
@@ -113,11 +115,11 @@ public partial class MainWindowViewModel(
     {
         if ( originalImageBuffer is null || SelectedTextConverter is null )
         {
-            AsciiResult = string.Empty;
             return;
         }
-        var resizedBuffer = ImageResizer.Resize(originalImageBuffer, AsciiArtWidth);
-        AsciiResult = SelectedTextConverter.Convert(resizedBuffer);
+
+        string asciiText = SelectedTextConverter.Convert(originalImageBuffer);
+        ProcessedImage = textRendererService.RenderTextToBitmap(asciiText, "Consolas", 4, Brushes.White, Brushes.Black);
     }
 
     [RelayCommand(CanExecute = nameof(CanLoadCameras))]
@@ -186,7 +188,8 @@ public partial class MainWindowViewModel(
     {
         if ( value is not null )
         {
-            SelectedTextConverter = null;
+            selectedTextConverter = null;
+            OnPropertyChanged(nameof(SelectedTextConverter));
         }
 
         ProcessImage();
@@ -196,7 +199,8 @@ public partial class MainWindowViewModel(
     {
         if ( value is not null )
         {
-            SelectedFilter = null;
+            selectedFilter = null;
+            OnPropertyChanged(nameof(SelectedFilter));
         }
 
         ConvertImageToText();

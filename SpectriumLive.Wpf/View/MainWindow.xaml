@@ -71,10 +71,6 @@
                     BorderBrush="{DynamicResource BorderColor}" BorderThickness="2" CornerRadius="5">
                 <Image Source="{Binding OriginalImage}"/>
             </Border>
-            <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5" Visibility="Collapsed">
-                <TextBox Text="{Binding AsciiResult}" FontFamily="Consolas" FontSize="4" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="NoWrap"
-                         Background="{DynamicResource PrimaryBackgroundColor}" Foreground="{DynamicResource PrimaryForegroundColor}" BorderThickness="0"/>
-            </Border>
         </Grid>
     </DockPanel>
 </Window>
