@@ -31,6 +31,7 @@ public partial class MainWindowViewModel(
     private readonly TextRendererService textRendererService = textRendererService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
+    public string AsciiBlockSizeText => $"Block Size: {AsciiBlockSize:F0}";
 
     public IEnumerable<IFilter> Filters { get; } = filterService.GetAvailableFilters();
     public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
@@ -57,6 +58,10 @@ public partial class MainWindowViewModel(
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoadCamerasCommand))]
     private bool isScanningCameras;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AsciiBlockSizeText))]
+    private double asciiBlockSize = 8;
 
     private ImageBuffer? originalImageBuffer;
 
@@ -115,11 +120,14 @@ public partial class MainWindowViewModel(
     {
         if ( originalImageBuffer is null || SelectedTextConverter is null )
         {
+            if ( SelectedFilter is null )
+                ProcessedImage = OriginalImage;
+
             return;
         }
 
-        string asciiText = SelectedTextConverter.Convert(originalImageBuffer);
-        ProcessedImage = textRendererService.RenderTextToBitmap(asciiText, "Consolas", 4, Brushes.White, Brushes.Black);
+        string asciiText = SelectedTextConverter.Convert(originalImageBuffer, (int)AsciiBlockSize);
+        ProcessedImage = textRendererService.RenderAsciiArt(asciiText, originalImageBuffer.Width, originalImageBuffer.Height);
     }
 
     [RelayCommand(CanExecute = nameof(CanLoadCameras))]
@@ -207,4 +215,5 @@ public partial class MainWindowViewModel(
     }
 
     partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
+    partial void OnAsciiBlockSizeChanged(double value) => ConvertImageToText();
 }

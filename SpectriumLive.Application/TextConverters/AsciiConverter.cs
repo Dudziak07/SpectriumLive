@@ -8,22 +8,52 @@ public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConver
 {
     public string Name { get; } = name;
 
-    public string Convert(ImageBuffer imageBuffer)
+    public string Convert(ImageBuffer imageBuffer, int blockSize)
     {
-        var rows = new string[imageBuffer.Height];
-        Parallel.For(0, imageBuffer.Height, y =>
-        {
-            var rowBuilder = new StringBuilder();
-            for ( int x = 0; x < imageBuffer.Width; x++ )
-            {
-                var pixel = imageBuffer.Pixels[y * imageBuffer.Width + x];
-                byte grayValue = ColorCalculator.ToGrayscale(pixel);
+        int validBlockSize = Math.Max(1, blockSize);
+        int widthInBlocks = imageBuffer.Width / validBlockSize;
+        int heightInBlocks = imageBuffer.Height / validBlockSize;
 
-                int index = (int)Math.Round(grayValue / 255.0 * ( asciiChars.Length - 1 ));
-                rowBuilder.Append(asciiChars[index]);
+        var rows = new string[heightInBlocks];
+        Parallel.For(0, heightInBlocks, y =>
+        {
+            var rowBuilder = new StringBuilder(widthInBlocks);
+            for ( int x = 0; x < widthInBlocks; x++ )
+            {
+                double totalGray = 0;
+                int pixelCount = 0;
+
+                int startY = y * validBlockSize;
+                int startX = x * validBlockSize;
+
+                for ( int blockY = 0; blockY < validBlockSize; blockY++ )
+                {
+                    for ( int blockX = 0; blockX < validBlockSize; blockX++ )
+                    {
+                        int currentX = startX + blockX;
+                        int currentY = startY + blockY;
+
+                        if ( currentX < imageBuffer.Width && currentY < imageBuffer.Height )
+                        {
+                            var pixel = imageBuffer.Pixels[currentY * imageBuffer.Width + currentX];
+                            totalGray += ColorCalculator.ToGrayscale(pixel);
+                            pixelCount++;
+                        }
+                    }
+                }
+
+                if ( pixelCount > 0 )
+                {
+                    byte avgGray = (byte)( totalGray / pixelCount );
+                    int index = (int)Math.Round(avgGray / 255.0 * ( asciiChars.Length - 1 ));
+                    rowBuilder.Append(asciiChars[index]);
+                }
             }
             rows[y] = rowBuilder.ToString();
         });
+
         return string.Join(Environment.NewLine, rows) + Environment.NewLine;
     }
+
+    public string Convert(ImageBuffer imageBuffer) => Convert(imageBuffer, 1);
 }
