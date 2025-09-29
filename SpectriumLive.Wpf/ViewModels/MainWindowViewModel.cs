@@ -61,7 +61,7 @@ public partial class MainWindowViewModel(
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AsciiBlockSizeText))]
-    private double asciiBlockSize = 8;
+    private double asciiBlockSize = 2;
 
     private ImageBuffer? originalImageBuffer;
 

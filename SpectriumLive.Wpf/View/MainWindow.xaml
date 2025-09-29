@@ -60,7 +60,7 @@
                         <StackPanel>
                             <ListBox ItemsSource="{Binding TextConverters}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedTextConverter}" MaxHeight="150"/>
                             <TextBlock Text="{Binding AsciiBlockSizeText}" Foreground="{DynamicResource PrimaryForegroundColor}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-                            <Slider Minimum="2" Maximum="20" Value="{Binding AsciiBlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                            <Slider Minimum="1" Maximum="20" Value="{Binding AsciiBlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
