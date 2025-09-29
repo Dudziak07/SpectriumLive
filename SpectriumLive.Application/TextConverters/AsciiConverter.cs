@@ -8,46 +8,36 @@ public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConver
 {
     public string Name { get; } = name;
 
+    private const double FontAspectRatio = 0.47;
+
     public string Convert(ImageBuffer imageBuffer, int blockSize)
     {
         int validBlockSize = Math.Max(1, blockSize);
         int widthInBlocks = imageBuffer.Width / validBlockSize;
-        int heightInBlocks = imageBuffer.Height / validBlockSize;
+        double aspectRatio = (double)imageBuffer.Height / imageBuffer.Width;
+        int heightInBlocks = (int)( widthInBlocks * aspectRatio * FontAspectRatio );
+
+        if ( widthInBlocks == 0 || heightInBlocks == 0 )
+            return string.Empty;
 
         var rows = new string[heightInBlocks];
+
         Parallel.For(0, heightInBlocks, y =>
         {
             var rowBuilder = new StringBuilder(widthInBlocks);
             for ( int x = 0; x < widthInBlocks; x++ )
             {
-                double totalGray = 0;
-                int pixelCount = 0;
+                int sourceX = x * validBlockSize;
+                int sourceY = (int)( y / FontAspectRatio * validBlockSize );
 
-                int startY = y * validBlockSize;
-                int startX = x * validBlockSize;
+                sourceX = Math.Min(sourceX, imageBuffer.Width - 1);
+                sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
 
-                for ( int blockY = 0; blockY < validBlockSize; blockY++ )
-                {
-                    for ( int blockX = 0; blockX < validBlockSize; blockX++ )
-                    {
-                        int currentX = startX + blockX;
-                        int currentY = startY + blockY;
+                var pixel = imageBuffer.Pixels[sourceY * imageBuffer.Width + sourceX];
+                byte grayValue = ColorCalculator.ToGrayscale(pixel);
 
-                        if ( currentX < imageBuffer.Width && currentY < imageBuffer.Height )
-                        {
-                            var pixel = imageBuffer.Pixels[currentY * imageBuffer.Width + currentX];
-                            totalGray += ColorCalculator.ToGrayscale(pixel);
-                            pixelCount++;
-                        }
-                    }
-                }
-
-                if ( pixelCount > 0 )
-                {
-                    byte avgGray = (byte)( totalGray / pixelCount );
-                    int index = (int)Math.Round(avgGray / 255.0 * ( asciiChars.Length - 1 ));
-                    rowBuilder.Append(asciiChars[index]);
-                }
+                int index = (int)Math.Round(grayValue / 255.0 * ( asciiChars.Length - 1 ));
+                rowBuilder.Append(asciiChars[index]);
             }
             rows[y] = rowBuilder.ToString();
         });
