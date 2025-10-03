@@ -7,7 +7,6 @@ namespace SpectriumLive.Application.Filters;
 public class BinaryFilter : IFilter
 {
     public string Name => "Binary";
-    public string Group => "Color";
     private const byte Threshold = 128;
 
     public void Apply(ImageBuffer imageBuffer)
