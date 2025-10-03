@@ -30,6 +30,7 @@ public partial class App : System.Windows.Application
             .AddSingleton<TextConverterService>()
             .AddSingleton<CameraService>()
             .AddSingleton<ThemeService>()
+            .AddSingleton<TextRendererService>()
             .AddSingleton<IImageFileService, WpfImageFileService>()
 
             // ViewModels

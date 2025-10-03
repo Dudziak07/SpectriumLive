@@ -5,4 +5,5 @@ public interface IImageToTextConverter
 {
     string Name { get; }
     string Convert(ImageBuffer imageBuffer);
+    string Convert(ImageBuffer imageBuffer, int blockSize);
 }
