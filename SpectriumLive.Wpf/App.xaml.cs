@@ -29,6 +29,7 @@ public partial class App : System.Windows.Application
             .AddSingleton<ProcessorService>()
             .AddSingleton<CameraService>()
             .AddSingleton<ThemeService>()
+            .AddSingleton<TextRendererService>()
             .AddSingleton<IImageFileService, WpfImageFileService>()
 
             // ViewModels
