@@ -4,5 +4,5 @@ public enum ImageProcessorGroup
     Ascii,
     Color,
     Convolution,
-    Fisheye
+    Distortion
 }

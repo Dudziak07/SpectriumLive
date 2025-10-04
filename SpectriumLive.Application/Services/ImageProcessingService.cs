@@ -31,7 +31,7 @@ public class ImageProcessingService
         yield return new GaussianBlurFilter();
         yield return new EdgeDetectionFilter();
 
-        // Fisheye
+        // Distortion
         yield return new FisheyeFilter(1.0); // Fisheye
         yield return new FisheyeFilter(-1.0); // Defisheye
     }
