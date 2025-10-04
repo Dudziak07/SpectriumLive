@@ -66,6 +66,12 @@ public partial class MainWindowViewModel(
     private WriteableBitmap? cameraFrameBitmap;
 
     [RelayCommand]
+    private void SelectProcessor(ImageProcessorViewModel? processor)
+    {
+        SelectedProcessor = processor;
+    }
+
+    [RelayCommand]
     private void SetTheme(string themeName)
     {
         var theme = themeName.ToLower() switch

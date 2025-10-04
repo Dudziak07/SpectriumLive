@@ -120,20 +120,8 @@
   <data name="File_Header" xml:space="preserve">
     <value>Plik</value>
   </data>
-  <data name="Group_Distortion" xml:space="preserve">
-    <value>Zniekształcenie</value>
-  </data>
   <data name="FreezeButton_Content" xml:space="preserve">
     <value>Zamroź</value>
-  </data>
-  <data name="Group_Ascii" xml:space="preserve">
-    <value>Sztuka ASCII</value>
-  </data>
-  <data name="Group_Color" xml:space="preserve">
-    <value>Kolor</value>
-  </data>
-  <data name="Group_Convolution" xml:space="preserve">
-    <value>Filtry splotu</value>
   </data>
   <data name="ImageFilters_Header" xml:space="preserve">
     <value>Filtry obrazu</value>
@@ -168,7 +156,22 @@
   <data name="TextConverters_Header" xml:space="preserve">
     <value>Konwertery tekstu</value>
   </data>
+  <data name="Group_Distortion" xml:space="preserve">
+    <value>Zniekształcenie</value>
+  </data>
+  <data name="Group_Ascii" xml:space="preserve">
+    <value>Sztuka ASCII</value>
+  </data>
+  <data name="Group_Color" xml:space="preserve">
+    <value>Kolor</value>
+  </data>
+  <data name="Group_Convolution" xml:space="preserve">
+    <value>Filtry splotu</value>
+  </data>
   <data name="ImageProcessing_Header" xml:space="preserve">
     <value>Przetwarzanie obrazów</value>
+  </data>
+  <data name="ImageProcessingProperties_Header" xml:space="preserve">
+    <value>Właściwości</value>
   </data>
 </root>

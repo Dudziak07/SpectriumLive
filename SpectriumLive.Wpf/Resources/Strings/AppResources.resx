@@ -120,20 +120,8 @@
   <data name="File_Header" xml:space="preserve">
     <value>File</value>
   </data>
-  <data name="Group_Distortion" xml:space="preserve">
-    <value>Distortion</value>
-  </data>
   <data name="FreezeButton_Content" xml:space="preserve">
     <value>Freeze</value>
-  </data>
-  <data name="Group_Ascii" xml:space="preserve">
-    <value>ASCII Art</value>
-  </data>
-  <data name="Group_Color" xml:space="preserve">
-    <value>Color</value>
-  </data>
-  <data name="Group_Convolution" xml:space="preserve">
-    <value>Convolution</value>
   </data>
   <data name="ImageFilters_Header" xml:space="preserve">
     <value>Image Filters</value>
@@ -168,7 +156,22 @@
   <data name="TextConverters_Header" xml:space="preserve">
     <value>Text Converters</value>
   </data>
+  <data name="Group_Distortion" xml:space="preserve">
+    <value>Distortion</value>
+  </data>
+  <data name="Group_Ascii" xml:space="preserve">
+    <value>ASCII Art</value>
+  </data>
+  <data name="Group_Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Group_Convolution" xml:space="preserve">
+    <value>Convolution</value>
+  </data>
   <data name="ImageProcessing_Header" xml:space="preserve">
     <value>Image Processing</value>
+  </data>
+  <data name="ImageProcessingProperties_Header" xml:space="preserve">
+    <value>Properties</value>
   </data>
 </root>

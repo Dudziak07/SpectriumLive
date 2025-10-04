@@ -34,61 +34,64 @@
 
         <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="5">
-                <StackPanel>
-                    <GroupBox Header="{x:Static res:AppResources.File_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
-                        <StackPanel Margin="5">
-                            <Button Content="{x:Static res:AppResources.LoadImageButton_Content}" Command="{Binding LoadImageCommand}"/>
-                            <Button Content="{x:Static res:AppResources.SaveImageButton_Content}" Command="{Binding SaveImageCommand}" Margin="0,5,0,0"/>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
-                        <StackPanel Margin="5">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableCameras}" DisplayMemberPath="Name" SelectedValuePath="Index" SelectedValue="{Binding SelectedCameraIndex}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="DropDownOpened">
-                                            <i:InvokeCommandAction Command="{Binding LoadCamerasCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ComboBox>
-                                <Button Grid.Column="1" Content="⟳" Command="{Binding LoadCamerasCommand}" ToolTip="Refresh camera list" Margin="5,0,0,0" Padding="5,2"/>
-                            </Grid>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
-                                <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
+                <DockPanel>
+                    <StackPanel>
+                        <GroupBox Header="{x:Static res:AppResources.File_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                            <StackPanel Margin="5">
+                                <Button Content="{x:Static res:AppResources.LoadImageButton_Content}" Command="{Binding LoadImageCommand}"/>
+                                <Button Content="{x:Static res:AppResources.SaveImageButton_Content}" Command="{Binding SaveImageCommand}" Margin="0,5,0,0"/>
                             </StackPanel>
-                        </StackPanel>
-                    </GroupBox>
+                        </GroupBox>
 
-                    <GroupBox Header="{x:Static res:AppResources.ImageProcessing_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
-                        <StackPanel>
-                            <ListBox ItemsSource="{Binding Source={StaticResource GroupedProcessors}}"
-                                     SelectedItem="{Binding SelectedProcessor}"
-                                     DisplayMemberPath="Name"
-                                     MaxHeight="500">
-                                <ListBox.GroupStyle>
-                                    <GroupStyle>
-                                        <GroupStyle.HeaderTemplate>
-                                            <DataTemplate>
-                                                <TextBlock FontWeight="Bold" Text="{Binding Name}" Margin="0,5"/>
-                                            </DataTemplate>
-                                        </GroupStyle.HeaderTemplate>
-                                    </GroupStyle>
-                                </ListBox.GroupStyle>
-                            </ListBox>
+                        <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                            <StackPanel Margin="5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableCameras}" DisplayMemberPath="Name" SelectedValuePath="Index" SelectedValue="{Binding SelectedCameraIndex}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="DropDownOpened">
+                                                <i:InvokeCommandAction Command="{Binding LoadCamerasCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                    <Button Grid.Column="1" Content="⟳" Command="{Binding LoadCamerasCommand}" ToolTip="Refresh camera list" Margin="5,0,0,0" Padding="5,2"/>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                    <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
+                                    <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
 
-                            <StackPanel Visibility="{Binding IsTextConverterSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Margin="0,10,0,0">
+                        <GroupBox Header="{x:Static res:AppResources.ImageProcessing_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                            <ItemsControl ItemsSource="{Binding ImageProcessors}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding Name}"
+                                                Command="{Binding DataContext.SelectProcessorCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </GroupBox>
+                    </StackPanel>
+
+                    <GroupBox Header="{x:Static res:AppResources.ImageProcessingProperties_Header}"
+                              DockPanel.Dock="Bottom"
+                              Foreground="{DynamicResource PrimaryForegroundColor}"
+                              Visibility="{Binding IsTextConverterSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Margin="5">
+                            <StackPanel Visibility="{Binding IsTextConverterSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock Text="{Binding AsciiBlockSizeText}" Foreground="{DynamicResource PrimaryForegroundColor}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 <Slider Minimum="1" Maximum="20" Value="{Binding AsciiBlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
-                </StackPanel>
+                </DockPanel>
             </ScrollViewer>
         </Border>
 
