@@ -15,18 +15,24 @@ using System.Windows.Media.Imaging;
 
 namespace SpectriumLive.Wpf.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel(
+    ImageProcessingService imageProcessingService,
+    IImageFileService imageFileService,
+    CameraService cameraService,
+    ThemeService themeService,
+    TextRendererService textRendererService) : ViewModelBase
 {
-    private readonly ImageProcessingService imageProcessingService;
-    private readonly IImageFileService imageFileService;
-    private readonly CameraService cameraService;
-    private readonly ThemeService themeService;
-    private readonly TextRendererService textRendererService;
+    private readonly ImageProcessingService imageProcessingService = imageProcessingService;
+    private readonly IImageFileService imageFileService = imageFileService;
+    private readonly CameraService cameraService = cameraService;
+    private readonly ThemeService themeService = themeService;
+    private readonly TextRendererService textRendererService = textRendererService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
     public string AsciiBlockSizeText => $"Block Size: {AsciiBlockSize:F0}";
 
-    public IEnumerable<ImageProcessorViewModel> ImageProcessors { get; }
+    public IEnumerable<ImageProcessorViewModel> ImageProcessors { get; } = [.. imageProcessingService.GetAvailableProcessors()
+            .Select(p => new ImageProcessorViewModel(p))];
     public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
 
     [ObservableProperty]
@@ -58,23 +64,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private ImageBuffer? originalImageBuffer;
 
     private WriteableBitmap? cameraFrameBitmap;
-
-    public MainWindowViewModel(
-        ImageProcessingService imageProcessingService,
-        IImageFileService imageFileService,
-        CameraService cameraService,
-        ThemeService themeService,
-        TextRendererService textRendererService)
-    {
-        this.imageProcessingService = imageProcessingService;
-        this.imageFileService = imageFileService;
-        this.cameraService = cameraService;
-        this.themeService = themeService;
-        this.textRendererService = textRendererService;
-
-        ImageProcessors = [.. imageProcessingService.GetAvailableProcessors()
-            .Select(p => new ImageProcessorViewModel(p))];
-    }
 
     [RelayCommand]
     private void SetTheme(string themeName)
