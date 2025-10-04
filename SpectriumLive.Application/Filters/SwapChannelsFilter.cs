@@ -13,6 +13,7 @@ public enum SwapMode
 public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
 {
     public string Name { get; } = name;
+    public ImageProcessorGroup Group => ImageProcessorGroup.Color;
     private readonly SwapMode swapMode = swapMode;
 
     public void Apply(ImageBuffer imageBuffer)

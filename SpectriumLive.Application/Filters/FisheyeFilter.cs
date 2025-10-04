@@ -5,6 +5,7 @@ namespace SpectriumLive.Application.Filters;
 public class FisheyeFilter(double strength = 1.0) : IFilter
 {
     public string Name => strength >= 0 ? "Fisheye" : "Defisheye";
+    public ImageProcessorGroup Group => ImageProcessorGroup.Fisheye;
 
     public void Apply(ImageBuffer imageBuffer)
     {

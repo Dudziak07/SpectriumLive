@@ -1,9 +1,8 @@
 ﻿using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Core;
-public interface IImageToTextConverter
+public interface IImageToTextConverter : IImageProcessor
 {
-    string Name { get; }
     string Convert(ImageBuffer imageBuffer);
     string Convert(ImageBuffer imageBuffer, int blockSize);
 }

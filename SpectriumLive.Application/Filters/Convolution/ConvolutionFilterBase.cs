@@ -5,6 +5,7 @@ namespace SpectriumLive.Application.Filters.Convolution;
 public abstract class ConvolutionFilterBase : IFilter
 {
     public abstract string Name { get; }
+    public ImageProcessorGroup Group => ImageProcessorGroup.Convolution;
     protected abstract double[,] Kernel { get; }
     protected virtual double Factor { get; } = 1.0;
     protected virtual double Bias { get; } = 0.0;
