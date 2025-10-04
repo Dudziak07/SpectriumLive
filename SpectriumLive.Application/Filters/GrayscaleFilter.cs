@@ -7,6 +7,7 @@ namespace SpectriumLive.Application.Filters;
 public class GrayscaleFilter : IFilter
 {
     public string Name => "Grayscale";
+    public ImageProcessorGroup Group => ImageProcessorGroup.Color;
 
     public void Apply(ImageBuffer imageBuffer)
     {

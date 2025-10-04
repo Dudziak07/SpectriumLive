@@ -26,8 +26,7 @@ public partial class App : System.Windows.Application
     {
         services
             // Services
-            .AddSingleton<FilterService>()
-            .AddSingleton<TextConverterService>()
+            .AddSingleton<ImageProcessingService>()
             .AddSingleton<CameraService>()
             .AddSingleton<ThemeService>()
             .AddSingleton<TextRendererService>()
@@ -35,6 +34,7 @@ public partial class App : System.Windows.Application
 
             // ViewModels
             .AddSingleton<MainWindowViewModel>()
+            .AddSingleton<ImageProcessorViewModel>()
 
             // Views
             .AddSingleton<MainWindow>();

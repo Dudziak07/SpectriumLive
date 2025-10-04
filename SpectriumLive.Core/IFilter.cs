@@ -2,8 +2,7 @@
 
 namespace SpectriumLive.Core;
 
-public interface IFilter
+public interface IFilter : IImageProcessor
 {
-    string Name { get; }
     void Apply(ImageBuffer imageBuffer);
 }

@@ -79,11 +79,56 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ASCII Art.
+        /// </summary>
+        public static string Group_Ascii {
+            get {
+                return ResourceManager.GetString("Group_Ascii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color.
+        /// </summary>
+        public static string Group_Color {
+            get {
+                return ResourceManager.GetString("Group_Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Convolution.
+        /// </summary>
+        public static string Group_Convolution {
+            get {
+                return ResourceManager.GetString("Group_Convolution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Distortion.
+        /// </summary>
+        public static string Group_Distortion {
+            get {
+                return ResourceManager.GetString("Group_Distortion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image Filters.
         /// </summary>
         public static string ImageFilters_Header {
             get {
                 return ResourceManager.GetString("ImageFilters_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image Processing.
+        /// </summary>
+        public static string ImageProcessing_Header {
+            get {
+                return ResourceManager.GetString("ImageProcessing_Header", resourceCulture);
             }
         }
         

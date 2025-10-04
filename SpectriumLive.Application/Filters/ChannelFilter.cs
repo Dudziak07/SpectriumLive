@@ -13,6 +13,7 @@ public enum ChannelSelector
 public class ChannelFilter(string name, ChannelSelector channelSelector) : IFilter
 {
     public string Name { get; } = name;
+    public ImageProcessorGroup Group => ImageProcessorGroup.Color;
     private readonly ChannelSelector channelSelector = channelSelector;
 
     public void Apply(ImageBuffer imageBuffer)

@@ -6,6 +6,7 @@ namespace SpectriumLive.Application.Filters;
 public class SepiaFilter : IFilter
 {
     public string Name => "Sepia";
+    public ImageProcessorGroup Group => ImageProcessorGroup.Color;
 
     public void Apply(ImageBuffer imageBuffer)
     {

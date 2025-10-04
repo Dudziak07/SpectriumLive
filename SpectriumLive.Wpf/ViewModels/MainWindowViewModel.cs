@@ -16,15 +16,13 @@ using System.Windows.Media.Imaging;
 namespace SpectriumLive.Wpf.ViewModels;
 
 public partial class MainWindowViewModel(
-    FilterService filterService,
+    ImageProcessingService imageProcessingService,
     IImageFileService imageFileService,
-    TextConverterService textConverterService,
     CameraService cameraService,
     ThemeService themeService,
     TextRendererService textRendererService) : ViewModelBase
 {
-    private readonly FilterService filterService = filterService;
-    private readonly TextConverterService textConverterService = textConverterService;
+    private readonly ImageProcessingService imageProcessingService = imageProcessingService;
     private readonly IImageFileService imageFileService = imageFileService;
     private readonly CameraService cameraService = cameraService;
     private readonly ThemeService themeService = themeService;
@@ -33,8 +31,8 @@ public partial class MainWindowViewModel(
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
     public string AsciiBlockSizeText => $"Block Size: {AsciiBlockSize:F0}";
 
-    public IEnumerable<IFilter> Filters { get; } = filterService.GetAvailableFilters();
-    public IEnumerable<IImageToTextConverter> TextConverters { get; } = textConverterService.GetAvailableConverters();
+    public IEnumerable<ImageProcessorViewModel> ImageProcessors { get; } = [.. imageProcessingService.GetAvailableProcessors()
+            .Select(p => new ImageProcessorViewModel(p))];
     public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
 
     [ObservableProperty]
@@ -44,13 +42,13 @@ public partial class MainWindowViewModel(
     private ImageSource? processedImage;
 
     [ObservableProperty]
-    private IFilter? selectedFilter;
+    private ImageProcessorViewModel? selectedProcessor;
+
+    [ObservableProperty]
+    private bool isTextConverterSelected;
 
     [ObservableProperty]
     private string? asciiResult;
-
-    [ObservableProperty]
-    private IImageToTextConverter? selectedTextConverter;
 
     [ObservableProperty]
     private int selectedCameraIndex = -1;
@@ -91,17 +89,39 @@ public partial class MainWindowViewModel(
         }
     }
 
-    private void ProcessImage()
+    private void ProcessImageBasedOnSelection()
     {
-        if ( originalImageBuffer is null || SelectedFilter is null )
+        if ( originalImageBuffer is null )
         {
             ProcessedImage = OriginalImage;
             return;
         }
 
-        var bufferCopy = new ImageBuffer(originalImageBuffer.Width, originalImageBuffer.Height, (PixelData[])originalImageBuffer.Pixels.Clone());
-        SelectedFilter.Apply(bufferCopy);
-        ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
+        var processor = SelectedProcessor?.Processor;
+
+        if ( processor is null )
+        {
+            ProcessedImage = OriginalImage;
+            return;
+        }
+
+        if ( processor is IFilter filter )
+        {
+            var bufferCopy = new ImageBuffer(originalImageBuffer.Width, originalImageBuffer.Height, (PixelData[])originalImageBuffer.Pixels.Clone());
+            filter.Apply(bufferCopy);
+            ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
+        }
+        else if ( processor is IImageToTextConverter converter )
+        {
+            string asciiText = converter.Convert(originalImageBuffer, (int)AsciiBlockSize);
+            ProcessedImage = textRendererService.RenderAsciiArt(asciiText, originalImageBuffer.Width, originalImageBuffer.Height);
+        }
+    }
+
+    partial void OnSelectedProcessorChanged(ImageProcessorViewModel? value)
+    {
+        IsTextConverterSelected = value?.Processor is IImageToTextConverter;
+        ProcessImageBasedOnSelection();
     }
 
     private bool CanSaveImage() => ProcessedImage is not null;
@@ -114,20 +134,6 @@ public partial class MainWindowViewModel(
             var processedBuffer = ImageConverter.ToImageBuffer(processedBitmap);
             imageFileService.SaveImage(processedBuffer);
         }
-    }
-
-    private void ConvertImageToText()
-    {
-        if ( originalImageBuffer is null || SelectedTextConverter is null )
-        {
-            if ( SelectedFilter is null )
-                ProcessedImage = OriginalImage;
-
-            return;
-        }
-
-        string asciiText = SelectedTextConverter.Convert(originalImageBuffer, (int)AsciiBlockSize);
-        ProcessedImage = textRendererService.RenderAsciiArt(asciiText, originalImageBuffer.Width, originalImageBuffer.Height);
     }
 
     [RelayCommand(CanExecute = nameof(CanLoadCameras))]
@@ -182,38 +188,20 @@ public partial class MainWindowViewModel(
         WriteableBitmapConverter.ToWriteableBitmap(frame, cameraFrameBitmap);
 
         originalImageBuffer = ImageConverter.ToImageBuffer(cameraFrameBitmap);
-        ProcessImage();
-        ConvertImageToText();
+        ProcessImageBasedOnSelection();
     }
 
     partial void OnOriginalImageChanged(ImageSource? value)
     {
-        ProcessImage();
-        ConvertImageToText();
-    }
-
-    partial void OnSelectedFilterChanged(IFilter? value)
-    {
-        if ( value is not null )
-        {
-            selectedTextConverter = null;
-            OnPropertyChanged(nameof(SelectedTextConverter));
-        }
-
-        ProcessImage();
-    }
-
-    partial void OnSelectedTextConverterChanged(IImageToTextConverter? value)
-    {
-        if ( value is not null )
-        {
-            selectedFilter = null;
-            OnPropertyChanged(nameof(SelectedFilter));
-        }
-
-        ConvertImageToText();
+        ProcessImageBasedOnSelection();
     }
 
     partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
-    partial void OnAsciiBlockSizeChanged(double value) => ConvertImageToText();
+    partial void OnAsciiBlockSizeChanged(double value)
+    {
+        if ( IsTextConverterSelected )
+        {
+            ProcessImageBasedOnSelection();
+        }
+    }
 }
