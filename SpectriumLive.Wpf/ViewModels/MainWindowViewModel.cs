@@ -32,7 +32,7 @@ public partial class MainWindowViewModel(
     public string AsciiBlockSizeText => $"Block Size: {AsciiBlockSize:F0}";
 
     public IEnumerable<ImageProcessorViewModel> ImageProcessors { get; } = [.. imageProcessingService.GetAvailableProcessors()
-            .Select(p => new ImageProcessorViewModel(p))];
+        .Select(p => new ImageProcessorViewModel(p))];
     public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
 
     [ObservableProperty]
