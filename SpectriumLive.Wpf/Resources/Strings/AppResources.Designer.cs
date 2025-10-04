@@ -124,6 +124,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Image Processing.
+        /// </summary>
+        public static string ImageProcessing_Header {
+            get {
+                return ResourceManager.GetString("ImageProcessing_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Live Camera.
         /// </summary>
         public static string LiveCamera_Header {

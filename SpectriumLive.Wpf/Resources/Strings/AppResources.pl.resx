@@ -168,4 +168,7 @@
   <data name="TextConverters_Header" xml:space="preserve">
     <value>Konwertery tekstu</value>
   </data>
+  <data name="ImageProcessing_Header" xml:space="preserve">
+    <value>Przetwarzanie obrazów</value>
+  </data>
 </root>
