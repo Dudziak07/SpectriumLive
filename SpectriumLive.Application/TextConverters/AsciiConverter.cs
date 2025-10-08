@@ -1,19 +1,66 @@
 ﻿using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
+using System.ComponentModel;
 using System.Text;
 
 namespace SpectriumLive.Application.TextConverters;
-public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConverter
+
+public enum AsciiMode
 {
-    public string Name { get; } = name;
+    Binary,
+    Simple,
+    Full
+}
+
+public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
+{
+    public string Name => "ASCII";
     public ImageProcessorGroup Group => ImageProcessorGroup.Ascii;
 
     private const double FontAspectRatio = 0.47;
 
-    public string Convert(ImageBuffer imageBuffer, int blockSize)
+    private AsciiMode asciiMode = AsciiMode.Simple; // Default mode
+    public AsciiMode AsciiMode
     {
-        int validBlockSize = Math.Max(1, blockSize);
+        get => asciiMode;
+        set
+        {
+            if ( asciiMode != value )
+            {
+                asciiMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AsciiMode)));
+            }
+        }
+    }
+
+    private int blockSize = 2; // Default block size
+    public int BlockSize
+    {
+        get => blockSize;
+        set
+        {
+            if ( blockSize != value )
+            {
+                blockSize = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlockSize)));
+            }
+        }
+    }
+
+    public AsciiConverter() { }
+
+    public string Convert(ImageBuffer imageBuffer)
+    {
+        char[] asciiChars = asciiMode switch
+        {
+            AsciiMode.Binary => AsciiCharacterRamps.Binary,
+            AsciiMode.Simple => AsciiCharacterRamps.Simple,
+            AsciiMode.Full => AsciiCharacterRamps.Full,
+            _ => AsciiCharacterRamps.Simple
+        };
+
+        int validBlockSize = Math.Max(1, BlockSize);
         int widthInBlocks = imageBuffer.Width / validBlockSize;
         double aspectRatio = (double)imageBuffer.Height / imageBuffer.Width;
         int heightInBlocks = (int)( widthInBlocks * aspectRatio * FontAspectRatio );
@@ -46,5 +93,11 @@ public class AsciiConverter(string name, char[] asciiChars) : IImageToTextConver
         return string.Join(Environment.NewLine, rows) + Environment.NewLine;
     }
 
-    public string Convert(ImageBuffer imageBuffer) => Convert(imageBuffer, 1);
+    public string Convert(ImageBuffer imageBuffer, int blockSize)
+    {
+        BlockSize = blockSize;
+        return Convert(imageBuffer);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
