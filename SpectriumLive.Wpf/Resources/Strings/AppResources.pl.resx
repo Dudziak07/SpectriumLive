@@ -174,4 +174,40 @@
   <data name="ImageProcessingProperties_Header" xml:space="preserve">
     <value>Właściwości</value>
   </data>
+  <data name="Choose_Mode" xml:space="preserve">
+    <value>Tryb:</value>
+  </data>
+  <data name="Choose_Selected_Channel" xml:space="preserve">
+    <value>Wybrany kanał:</value>
+  </data>
+  <data name="Choose_Selected_Swap_Mode" xml:space="preserve">
+    <value>Wybrany tryb zamiany:</value>
+  </data>
+  <data name="Binary" xml:space="preserve">
+    <value>Binarny</value>
+  </data>
+  <data name="Simple" xml:space="preserve">
+    <value>Prosty</value>
+  </data>
+  <data name="Full" xml:space="preserve">
+    <value>Pełny</value>
+  </data>
+  <data name="Red" xml:space="preserve">
+    <value>Czerwony</value>
+  </data>
+  <data name="Green" xml:space="preserve">
+    <value>Zielony</value>
+  </data>
+  <data name="Blue" xml:space="preserve">
+    <value>Niebieski</value>
+  </data>
+  <data name="Red_Blue" xml:space="preserve">
+    <value>Czerwony - Niebieski</value>
+  </data>
+  <data name="Red_Green" xml:space="preserve">
+    <value>Czerwony - Zielony</value>
+  </data>
+  <data name="Green_Blue" xml:space="preserve">
+    <value>Zielony - Niebieski</value>
+  </data>
 </root>

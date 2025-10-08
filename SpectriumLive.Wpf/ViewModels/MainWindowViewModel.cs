@@ -10,6 +10,7 @@ using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.ViewModels.Base;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -29,7 +30,6 @@ public partial class MainWindowViewModel(
     private readonly TextRendererService textRendererService = textRendererService;
 
     private const int AsciiArtWidth = 150; // Width for ASCII art conversion
-    public string AsciiBlockSizeText => $"Block Size: {AsciiBlockSize:F0}";
 
     public IEnumerable<ImageProcessorViewModel> ImageProcessors { get; } = [.. imageProcessingService.GetAvailableProcessors()
         .Select(p => new ImageProcessorViewModel(p))];
@@ -56,10 +56,6 @@ public partial class MainWindowViewModel(
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoadCamerasCommand))]
     private bool isScanningCameras;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AsciiBlockSizeText))]
-    private double asciiBlockSize = 2;
 
     private ImageBuffer? originalImageBuffer;
 
@@ -119,14 +115,29 @@ public partial class MainWindowViewModel(
         }
         else if ( processor is IImageToTextConverter converter )
         {
-            string asciiText = converter.Convert(originalImageBuffer, (int)AsciiBlockSize);
+            string asciiText = converter.Convert(originalImageBuffer);
             ProcessedImage = textRendererService.RenderAsciiArt(asciiText, originalImageBuffer.Width, originalImageBuffer.Height);
         }
     }
 
-    partial void OnSelectedProcessorChanged(ImageProcessorViewModel? value)
+    partial void OnSelectedProcessorChanged(ImageProcessorViewModel? oldValue, ImageProcessorViewModel? newValue)
     {
-        IsTextConverterSelected = value?.Processor is IImageToTextConverter;
+        if ( oldValue?.Processor is INotifyPropertyChanged oldNotifier )
+        {
+            oldNotifier.PropertyChanged -= OnProcessorPropertyChanged;
+        }
+
+        if ( newValue?.Processor is INotifyPropertyChanged newNotifier )
+        {
+            newNotifier.PropertyChanged += OnProcessorPropertyChanged;
+        }
+
+        IsTextConverterSelected = newValue?.Processor is IImageToTextConverter;
+        ProcessImageBasedOnSelection();
+    }
+
+    private void OnProcessorPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
         ProcessImageBasedOnSelection();
     }
 
@@ -203,11 +214,4 @@ public partial class MainWindowViewModel(
     }
 
     partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
-    partial void OnAsciiBlockSizeChanged(double value)
-    {
-        if ( IsTextConverterSelected )
-        {
-            ProcessImageBasedOnSelection();
-        }
-    }
 }
