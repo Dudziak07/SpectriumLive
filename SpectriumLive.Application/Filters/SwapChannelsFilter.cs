@@ -1,5 +1,6 @@
 ﻿using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
+using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
 
@@ -10,11 +11,26 @@ public enum SwapMode
     GB
 }
 
-public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
+public class SwapChannelsFilter : IFilter, INotifyPropertyChanged
 {
-    public string Name { get; } = name;
+    public string Name => "Swap Channels";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
-    private readonly SwapMode swapMode = swapMode;
+
+    private SwapMode selectedMode = SwapMode.RB; // Default mode
+    public SwapMode SelectedMode
+    {
+        get => selectedMode;
+        set
+        {
+            if ( selectedMode != value )
+            {
+                selectedMode = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedMode)));
+            }
+        }
+    }
+
+    public SwapChannelsFilter() { }
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -22,7 +38,7 @@ public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
         {
             var pixel = imageBuffer.Pixels[i];
 
-            imageBuffer.Pixels[i] = swapMode switch
+            imageBuffer.Pixels[i] = selectedMode switch
             {
                 SwapMode.RB => new PixelData(pixel.B, pixel.G, pixel.R, pixel.A),
                 SwapMode.RG => new PixelData(pixel.G, pixel.R, pixel.B, pixel.A),
@@ -31,4 +47,6 @@ public class SwapChannelsFilter(string name, SwapMode swapMode) : IFilter
             };
         });
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
