@@ -1,5 +1,6 @@
 ﻿using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
+using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
 
@@ -10,11 +11,26 @@ public enum ChannelSelector
     B
 }
 
-public class ChannelFilter(string name, ChannelSelector channelSelector) : IFilter
+public class ChannelFilter : IFilter, INotifyPropertyChanged
 {
-    public string Name { get; } = name;
+    public string Name => "Channel Filter";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
-    private readonly ChannelSelector channelSelector = channelSelector;
+
+    private ChannelSelector channelSelector = ChannelSelector.R; // Default value
+    public ChannelSelector SelectedChannel
+    {
+        get => channelSelector;
+        set
+        {
+            if ( channelSelector != value )
+            {
+                channelSelector = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedChannel)));
+            }
+        }
+    }
+
+    public ChannelFilter() { }
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -31,4 +47,6 @@ public class ChannelFilter(string name, ChannelSelector channelSelector) : IFilt
             };
         });
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
