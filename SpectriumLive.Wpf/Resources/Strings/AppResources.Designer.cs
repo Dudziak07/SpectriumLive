@@ -232,6 +232,33 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Language.
+        /// </summary>
+        public static string MenuLanguage_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguage_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _English.
+        /// </summary>
+        public static string MenuLanguageEnglish_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguageEnglish_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Polish.
+        /// </summary>
+        public static string MenuLanguagePolish_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguagePolish_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Theme.
         /// </summary>
         public static string MenuTheme_Header {

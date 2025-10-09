@@ -210,4 +210,13 @@
   <data name="Green_Blue" xml:space="preserve">
     <value>Zielony - Niebieski</value>
   </data>
+  <data name="MenuLanguage_Header" xml:space="preserve">
+    <value>_Język</value>
+  </data>
+  <data name="MenuLanguagePolish_Header" xml:space="preserve">
+    <value>Polski</value>
+  </data>
+  <data name="MenuLanguageEnglish_Header" xml:space="preserve">
+    <value>_Angielski</value>
+  </data>
 </root>

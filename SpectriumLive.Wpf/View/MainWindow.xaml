@@ -70,6 +70,11 @@
                     <MenuItem Header="{x:Static res:AppResources.MenuThemeLight_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Light"/>
                     <MenuItem Header="{x:Static res:AppResources.MenuThemeDark_Header}" Command="{Binding SetThemeCommand}" CommandParameter="Dark"/>
                 </MenuItem>
+
+                <MenuItem Header="{x:Static res:AppResources.MenuLanguage_Header}">
+                    <MenuItem Header="{x:Static res:AppResources.MenuLanguagePolish_Header}" Command="{Binding SetLanguageCommand}" CommandParameter="pl-PL"/>
+                    <MenuItem Header="{x:Static res:AppResources.MenuLanguageEnglish_Header}" Command="{Binding SetLanguageCommand}" CommandParameter="en-US"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
 

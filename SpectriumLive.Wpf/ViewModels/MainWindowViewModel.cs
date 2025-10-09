@@ -8,9 +8,11 @@ using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 using SpectriumLive.Wpf.Converters;
 using SpectriumLive.Wpf.Services;
+using SpectriumLive.Wpf.View;
 using SpectriumLive.Wpf.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -84,6 +86,30 @@ public partial class MainWindowViewModel(
         };
 
         themeService.SwitchTheme(theme);
+    }
+
+    [RelayCommand]
+    private void SetLanguage(string cultureCode)
+    {
+        if ( string.IsNullOrWhiteSpace(cultureCode) )
+            return;
+
+        Thread.CurrentThread.CurrentCulture = new CultureInfo(cultureCode);
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo(cultureCode);
+
+        var oldWindow = System.Windows.Application.Current.MainWindow;
+
+        var newViewModel = new MainWindowViewModel(
+            imageProcessingService,
+            imageFileService,
+            cameraService,
+            themeService,
+            textRendererService);
+        var newWindow = new MainWindow(newViewModel);
+        newWindow.Show();
+
+        System.Windows.Application.Current.MainWindow = newWindow;
+        oldWindow?.Close();
     }
 
     [RelayCommand]
