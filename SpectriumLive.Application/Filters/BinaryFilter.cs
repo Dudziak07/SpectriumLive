@@ -8,6 +8,7 @@ public class BinaryFilter : IFilter
 {
     public string Name => "Binary";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => false;
     private const byte Threshold = 128;
 
     public void Apply(ImageBuffer imageBuffer)

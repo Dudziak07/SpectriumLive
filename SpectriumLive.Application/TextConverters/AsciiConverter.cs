@@ -17,6 +17,7 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
 {
     public string Name => "ASCII";
     public ImageProcessorGroup Group => ImageProcessorGroup.Ascii;
+    public bool HasConfigurableProperties => true;
 
     private const double FontAspectRatio = 0.47;
 

@@ -7,6 +7,7 @@ public class NegativeFilter : IFilter
 {
     public string Name => "Negative";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => false;
 
     public void Apply(ImageBuffer imageBuffer)
     {

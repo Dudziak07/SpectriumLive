@@ -15,6 +15,7 @@ public class SwapChannelsFilter : IFilter, INotifyPropertyChanged
 {
     public string Name => "Swap Channels";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => true;
 
     private SwapMode selectedMode = SwapMode.RB; // Default mode
     public SwapMode SelectedMode

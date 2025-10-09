@@ -5,4 +5,5 @@ public interface IImageProcessor
 {
     string Name { get; }
     ImageProcessorGroup Group { get; }
+    bool HasConfigurableProperties { get; }
 }

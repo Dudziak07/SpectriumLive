@@ -15,6 +15,7 @@ public class ChannelFilter : IFilter, INotifyPropertyChanged
 {
     public string Name => "Channel Filter";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => true;
 
     private ChannelSelector channelSelector = ChannelSelector.R; // Default value
     public ChannelSelector SelectedChannel
