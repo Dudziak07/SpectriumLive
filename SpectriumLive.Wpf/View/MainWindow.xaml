@@ -30,7 +30,17 @@
                 <RadioButton Content="{x:Static res:AppResources.Full}" GroupName="AsciiMode" IsChecked="{Binding AsciiMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static textConverters:AsciiMode.Full}}" />
 
                 <TextBlock Text="{Binding BlockSize, StringFormat='Block Size: {0}'}" HorizontalAlignment="Center" Margin="0,10,0,0" />
-                <Slider Minimum="1" Maximum="20" Value="{Binding BlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}" Width="25" Margin="0,0,5,0" Padding="0,2"/>
+                    <Slider x:Name="BlockSizeSlider" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding BlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}" Width="25" Margin="0,0,5,0" Padding="0,2"/>
+                </Grid>
             </StackPanel>
         </DataTemplate>
 
