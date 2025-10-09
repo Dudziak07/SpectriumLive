@@ -4,5 +4,5 @@
     <SolidColorBrush x:Key="SecondaryBackgroundColor" Color="White"/>
     <SolidColorBrush x:Key="PrimaryForegroundColor" Color="DarkGray"/>
     <SolidColorBrush x:Key="BorderColor" Color="#FFCCCCCC"/>
-    <SolidColorBrush x:Key="AccentColor" Color="#FF007ACC"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#FFC90094"/>
 </ResourceDictionary>
