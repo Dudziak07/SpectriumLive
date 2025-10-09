@@ -64,7 +64,14 @@ public partial class MainWindowViewModel(
     [RelayCommand]
     private void SelectProcessor(ImageProcessorViewModel? processor)
     {
-        SelectedProcessor = processor;
+        if ( ReferenceEquals(SelectedProcessor, processor) )
+        {
+            SelectedProcessor = null;
+        }
+        else
+        {
+            SelectedProcessor = processor;
+        }
     }
 
     [RelayCommand]
