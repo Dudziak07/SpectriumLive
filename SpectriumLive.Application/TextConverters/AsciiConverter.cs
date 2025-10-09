@@ -64,7 +64,7 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
         int validBlockSize = Math.Max(1, BlockSize);
         int widthInBlocks = imageBuffer.Width / validBlockSize;
         double aspectRatio = (double)imageBuffer.Height / imageBuffer.Width;
-        int heightInBlocks = (int)( widthInBlocks * aspectRatio * FontAspectRatio );
+        int heightInBlocks = (int)Math.Ceiling(widthInBlocks * aspectRatio * FontAspectRatio);
 
         if ( widthInBlocks == 0 || heightInBlocks == 0 )
             return string.Empty;
