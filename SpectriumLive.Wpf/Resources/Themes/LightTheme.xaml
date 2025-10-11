@@ -9,6 +9,7 @@
     <SolidColorBrush x:Key="Disabled.ForegroundColor" Color="#A0A0A0"/>
     <SolidColorBrush x:Key="Disabled.BackgroundColor" Color="#E0E0E0"/>
 
+    <!-- Button -->
     <SolidColorBrush x:Key="Button.Static.Background" Color="#E1E1E1"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="#ADADAD"/>
     <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#BEE6FD"/>
@@ -16,4 +17,8 @@
     <SolidColorBrush x:Key="Button.Pressed.Background" Color="#A4D8F9"/>
     <SolidColorBrush x:Key="Button.Pressed.Border" Color="#2C628B"/>
     <SolidColorBrush x:Key="Button.Foreground" Color="#1E1E1E"/>
+
+    <!-- GroupBox -->
+    <SolidColorBrush x:Key="GroupBox.Border" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="GroupBox.Header.Foreground" Color="#1E1E1E"/>
 </ResourceDictionary>
