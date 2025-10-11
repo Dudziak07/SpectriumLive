@@ -7,6 +7,7 @@ public class SepiaFilter : IFilter
 {
     public string Name => "Sepia";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => false;
 
     public void Apply(ImageBuffer imageBuffer)
     {

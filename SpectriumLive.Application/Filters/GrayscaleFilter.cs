@@ -8,6 +8,7 @@ public class GrayscaleFilter : IFilter
 {
     public string Name => "Grayscale";
     public ImageProcessorGroup Group => ImageProcessorGroup.Color;
+    public bool HasConfigurableProperties => false;
 
     public void Apply(ImageBuffer imageBuffer)
     {

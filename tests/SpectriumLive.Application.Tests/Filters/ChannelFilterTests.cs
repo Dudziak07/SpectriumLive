@@ -26,7 +26,10 @@ public class ChannelFilterTests
         PixelData expectedPixel)
     {
         // Arrange
-        var filter = new ChannelFilter($"Test {mode}", mode);
+        var filter = new ChannelFilter
+        {
+            SelectedChannel = mode
+        };
         var image = new ImageBuffer(1, 1, [originalPixel]);
 
         // Act

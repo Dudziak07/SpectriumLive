@@ -26,7 +26,10 @@ public class SwapChannelsFilterTests
         PixelData expectedPixel)
     {
         // Arrange
-        var filter = new SwapChannelsFilter($"Test {mode}", mode);
+        var filter = new SwapChannelsFilter
+        {
+            SelectedMode = mode
+        };
         var image = new ImageBuffer(1, 1, [originalPixel]);
 
         // Act

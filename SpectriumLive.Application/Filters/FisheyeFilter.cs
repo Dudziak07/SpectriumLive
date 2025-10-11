@@ -6,6 +6,7 @@ public class FisheyeFilter(double strength = 1.0) : IFilter
 {
     public string Name => strength >= 0 ? "Fisheye" : "Defisheye";
     public ImageProcessorGroup Group => ImageProcessorGroup.Distortion;
+    public bool HasConfigurableProperties => false;
 
     public void Apply(ImageBuffer imageBuffer)
     {

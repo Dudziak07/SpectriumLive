@@ -61,6 +61,51 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Binary.
+        /// </summary>
+        public static string Binary {
+            get {
+                return ResourceManager.GetString("Binary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        public static string Blue {
+            get {
+                return ResourceManager.GetString("Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mode:.
+        /// </summary>
+        public static string Choose_Mode {
+            get {
+                return ResourceManager.GetString("Choose_Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Channel:.
+        /// </summary>
+        public static string Choose_Selected_Channel {
+            get {
+                return ResourceManager.GetString("Choose_Selected_Channel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Swap Mode:.
+        /// </summary>
+        public static string Choose_Selected_Swap_Mode {
+            get {
+                return ResourceManager.GetString("Choose_Selected_Swap_Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File.
         /// </summary>
         public static string File_Header {
@@ -75,6 +120,33 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         public static string FreezeButton_Content {
             get {
                 return ResourceManager.GetString("FreezeButton_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Full.
+        /// </summary>
+        public static string Full {
+            get {
+                return ResourceManager.GetString("Full", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        public static string Green {
+            get {
+                return ResourceManager.GetString("Green", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green - Blue.
+        /// </summary>
+        public static string Green_Blue {
+            get {
+                return ResourceManager.GetString("Green_Blue", resourceCulture);
             }
         }
         
@@ -133,6 +205,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Properties.
+        /// </summary>
+        public static string ImageProcessingProperties_Header {
+            get {
+                return ResourceManager.GetString("ImageProcessingProperties_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Live Camera.
         /// </summary>
         public static string LiveCamera_Header {
@@ -147,6 +228,33 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         public static string LoadImageButton_Content {
             get {
                 return ResourceManager.GetString("LoadImageButton_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Language.
+        /// </summary>
+        public static string MenuLanguage_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguage_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _English.
+        /// </summary>
+        public static string MenuLanguageEnglish_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguageEnglish_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Polish.
+        /// </summary>
+        public static string MenuLanguagePolish_Header {
+            get {
+                return ResourceManager.GetString("MenuLanguagePolish_Header", resourceCulture);
             }
         }
         
@@ -187,11 +295,47 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        public static string Red {
+            get {
+                return ResourceManager.GetString("Red", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red - Blue.
+        /// </summary>
+        public static string Red_Blue {
+            get {
+                return ResourceManager.GetString("Red_Blue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red - Green.
+        /// </summary>
+        public static string Red_Green {
+            get {
+                return ResourceManager.GetString("Red_Green", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save Image.
         /// </summary>
         public static string SaveImageButton_Content {
             get {
                 return ResourceManager.GetString("SaveImageButton_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Simple.
+        /// </summary>
+        public static string Simple {
+            get {
+                return ResourceManager.GetString("Simple", resourceCulture);
             }
         }
         
