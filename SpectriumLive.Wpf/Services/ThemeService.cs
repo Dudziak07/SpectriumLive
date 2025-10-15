@@ -17,11 +17,13 @@ public class ThemeService
         if ( currentThemeDictionary == null )
             return;
 
-        var newThemeUri = theme switch
+        string themeFileName = theme switch
         {
-            Theme.Light => new Uri("Resources/Themes/LightTheme.xaml", UriKind.Relative),
-            _ => new Uri("Resources/Themes/DarkTheme.xaml", UriKind.Relative),
+            Theme.Light => "LightTheme.xaml",
+            _ => "DarkTheme.xaml",
         };
+
+        var newThemeUri = new Uri($"pack://application:,,,/SpectriumLive.Styles;component/Themes/{themeFileName}", UriKind.Absolute);
 
         currentThemeDictionary!.Source = newThemeUri;
     }

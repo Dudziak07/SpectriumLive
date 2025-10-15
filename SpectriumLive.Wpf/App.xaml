@@ -5,8 +5,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Themes/DarkTheme.xaml"/>
-                <ResourceDictionary Source="Resources/Styles/GlobalStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SpectriumLive.Styles;component/Themes/DarkTheme.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/SpectriumLive.Styles;component/Styles/GlobalStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
