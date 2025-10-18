@@ -78,7 +78,7 @@
             </MenuItem>
         </Menu>
 
-        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5">
+        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="5">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
@@ -153,7 +153,7 @@
             </ScrollViewer>
         </Border>
 
-        <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5">
+        <Grid Background="{DynamicResource PrimaryBackgroundColor}">
             <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5">
                 <Viewbox>
                     <Image Source="{Binding ProcessedImage}"/>
