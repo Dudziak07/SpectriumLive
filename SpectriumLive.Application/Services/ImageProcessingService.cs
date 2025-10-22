@@ -26,6 +26,5 @@ public class ImageProcessingService
 
         // Distortion
         yield return new FisheyeFilter(1.0); // Fisheye
-        yield return new FisheyeFilter(-1.0); // Defisheye
     }
 }
