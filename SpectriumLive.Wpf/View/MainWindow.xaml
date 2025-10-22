@@ -61,6 +61,23 @@
                 <RadioButton Content="{x:Static res:AppResources.Green_Blue}" GroupName="SwapMode" IsChecked="{Binding SelectedMode, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static filters:SwapMode.GB}}" />
             </StackPanel>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type filters:FisheyeFilter}">
+            <StackPanel>
+                <TextBlock Text="{Binding Strength, StringFormat='Strength: {0:F2}'}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=StrengthSlider}"/>
+                    <Slider x:Name="StrengthSlider" Grid.Column="1" Minimum="-2.0" Maximum="2.0" Value="{Binding Strength, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="0.1" TickPlacement="BottomRight"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=StrengthSlider}"/>
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <DockPanel>

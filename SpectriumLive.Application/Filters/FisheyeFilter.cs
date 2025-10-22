@@ -1,12 +1,28 @@
 ﻿using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
+using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
-public class FisheyeFilter(double strength = 1.0) : IFilter
+public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChanged
 {
-    public string Name => strength >= 0 ? "Fisheye" : "Defisheye";
+    public string Name => "Fisheye";
     public ImageProcessorGroup Group => ImageProcessorGroup.Distortion;
-    public bool HasConfigurableProperties => false;
+    public bool HasConfigurableProperties => true;
+
+    public double Strength
+    {
+        get => strength;
+        set
+        {
+            if ( strength != value )
+            {
+                strength = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Strength)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Apply(ImageBuffer imageBuffer)
     {
@@ -32,9 +48,9 @@ public class FisheyeFilter(double strength = 1.0) : IFilter
                 {
                     double theta = Math.Atan2(dy, dx);
 
-                    double newR = strength >= 0
-                        ? Math.Pow(r, 1 + strength)
-                        : Math.Pow(r, 1.0 / ( 1 - strength ));
+                    double newR = Strength >= 0
+                        ? Math.Pow(r, 1 + Strength)
+                        : Math.Pow(r, 1.0 / ( 1 - Strength ));
 
                     double srcX = centerX + newR * radius * Math.Cos(theta);
                     double srcY = centerY + newR * radius * Math.Sin(theta);
