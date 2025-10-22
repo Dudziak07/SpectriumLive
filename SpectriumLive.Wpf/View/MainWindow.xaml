@@ -37,9 +37,9 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}" Width="25" Margin="0,0,5,0" Padding="0,2"/>
-                    <Slider x:Name="BlockSizeSlider" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding BlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1"/>
-                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}" Width="25" Margin="0,0,5,0" Padding="0,2"/>
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}"/>
+                    <Slider x:Name="BlockSizeSlider" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding BlockSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="BottomRight"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=BlockSizeSlider}"/>
                 </Grid>
             </StackPanel>
         </DataTemplate>
@@ -78,18 +78,18 @@
             </MenuItem>
         </Menu>
 
-        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}" Margin="5">
+        <Border DockPanel.Dock="Left" Width="250" Background="{DynamicResource SecondaryBackgroundColor}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="5">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
-                        <GroupBox Header="{x:Static res:AppResources.File_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <GroupBox Header="{x:Static res:AppResources.File_Header}">
                             <StackPanel Margin="5">
                                 <Button Content="{x:Static res:AppResources.LoadImageButton_Content}" Command="{Binding LoadImageCommand}"/>
                                 <Button Content="{x:Static res:AppResources.SaveImageButton_Content}" Command="{Binding SaveImageCommand}" Margin="0,5,0,0"/>
                             </StackPanel>
                         </GroupBox>
 
-                        <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <GroupBox Header="{x:Static res:AppResources.LiveCamera_Header}">
                             <StackPanel Margin="5">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -103,16 +103,16 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </ComboBox>
-                                    <Button Grid.Column="1" Content="⟳" Command="{Binding LoadCamerasCommand}" ToolTip="Refresh camera list" Margin="5,0,0,0" Padding="5,2"/>
+                                    <Button Grid.Column="1" Content="⟳" Command="{Binding LoadCamerasCommand}" ToolTip="Refresh camera list" Margin="5,0,0,0"/>
                                 </Grid>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
-                                    <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Padding="10,2" Command="{Binding StartCameraCommand}"/>
-                                    <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Padding="10,2" Command="{Binding StopCameraCommand}"/>
+                                    <Button Content="{x:Static res:AppResources.StartButton_Content}" Margin="5" Command="{Binding StartCameraCommand}"/>
+                                    <Button Content="{x:Static res:AppResources.StopButton_Content}" Margin="5" Command="{Binding StopCameraCommand}"/>
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox>
 
-                        <GroupBox Header="{x:Static res:AppResources.ImageProcessing_Header}" Foreground="{DynamicResource PrimaryForegroundColor}" Margin="0,0,0,10">
+                        <GroupBox Header="{x:Static res:AppResources.ImageProcessing_Header}">
                             <ItemsControl ItemsSource="{Binding ImageProcessors}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -146,7 +146,6 @@
 
                     <GroupBox Header="{x:Static res:AppResources.ImageProcessingProperties_Header}"
                               DockPanel.Dock="Bottom"
-                              Foreground="{DynamicResource PrimaryForegroundColor}"
                               Visibility="{Binding SelectedProcessor.Processor.HasConfigurableProperties, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
                         <ContentControl Content="{Binding SelectedProcessor.Processor}" Margin="5"/>
                     </GroupBox>
@@ -154,7 +153,7 @@
             </ScrollViewer>
         </Border>
 
-        <Grid Background="{DynamicResource PrimaryBackgroundColor}" Margin="5">
+        <Grid Background="{DynamicResource PrimaryBackgroundColor}">
             <Border BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5">
                 <Viewbox>
                     <Image Source="{Binding ProcessedImage}"/>

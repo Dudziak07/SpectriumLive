@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace SpectriumLive.Wpf.Services;
+﻿namespace SpectriumLive.Wpf.Services;
 
 public enum Theme
 {
@@ -12,15 +10,21 @@ public class ThemeService
 {
     public void SwitchTheme(Theme theme)
     {
-        var themeDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
-        themeDictionaries.Clear();
+        var mergedDictionaries = System.Windows.Application.Current.Resources.MergedDictionaries;
+        var currentThemeDictionary = mergedDictionaries
+            .FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Themes/"));
 
-        var newThemeUri = theme switch
+        if ( currentThemeDictionary == null )
+            return;
+
+        string themeFileName = theme switch
         {
-            Theme.Light => new Uri("Resources/Themes/LightTheme.xaml", UriKind.Relative),
-            _ => new Uri("Resources/Themes/DarkTheme.xaml", UriKind.Relative),
+            Theme.Light => "LightTheme.xaml",
+            _ => "DarkTheme.xaml",
         };
 
-        themeDictionaries.Add(new ResourceDictionary { Source = newThemeUri });
+        var newThemeUri = new Uri($"pack://application:,,,/SpectriumLive.Styles;component/Themes/{themeFileName}", UriKind.Absolute);
+
+        currentThemeDictionary!.Source = newThemeUri;
     }
 }
