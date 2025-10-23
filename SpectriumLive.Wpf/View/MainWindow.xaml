@@ -16,6 +16,12 @@
         Height="600" Width="800"
         WindowState="Maximized">
 
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SaveImageCommand}"
+                    Key="S"
+                    Modifiers="Ctrl"/>
+    </Window.InputBindings>
+    
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
