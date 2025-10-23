@@ -225,4 +225,37 @@
   <data name="MenuClearImage_Header" xml:space="preserve">
     <value>Clear Image</value>
   </data>
+  <data name="Filter_Ascii" xml:space="preserve">
+    <value>ASCII</value>
+  </data>
+  <data name="Filter_Binary" xml:space="preserve">
+    <value>Binary</value>
+  </data>
+  <data name="Filter_Grayscale" xml:space="preserve">
+    <value>Grayscale</value>
+  </data>
+  <data name="Filter_Negative" xml:space="preserve">
+    <value>Negative</value>
+  </data>
+  <data name="Filter_Sepia" xml:space="preserve">
+    <value>Sepia</value>
+  </data>
+  <data name="Filter_SwapChannels" xml:space="preserve">
+    <value>Swap Channels</value>
+  </data>
+  <data name="Filter_ChannelFilter" xml:space="preserve">
+    <value>Channel Filter</value>
+  </data>
+  <data name="Filter_BoxBlur" xml:space="preserve">
+    <value>Box Blur</value>
+  </data>
+  <data name="Filter_GaussianBlur" xml:space="preserve">
+    <value>Gaussian Blur</value>
+  </data>
+  <data name="Filter_EdgeDetection" xml:space="preserve">
+    <value>Edge Detection</value>
+  </data>
+  <data name="Filter_Fisheye" xml:space="preserve">
+    <value>Fisheye</value>
+  </data>
 </root>

@@ -115,6 +115,105 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ASCII.
+        /// </summary>
+        public static string Filter_Ascii {
+            get {
+                return ResourceManager.GetString("Filter_Ascii", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Binary.
+        /// </summary>
+        public static string Filter_Binary {
+            get {
+                return ResourceManager.GetString("Filter_Binary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Box Blur.
+        /// </summary>
+        public static string Filter_BoxBlur {
+            get {
+                return ResourceManager.GetString("Filter_BoxBlur", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Channel Filter.
+        /// </summary>
+        public static string Filter_ChannelFilter {
+            get {
+                return ResourceManager.GetString("Filter_ChannelFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edge Detection.
+        /// </summary>
+        public static string Filter_EdgeDetection {
+            get {
+                return ResourceManager.GetString("Filter_EdgeDetection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fisheye.
+        /// </summary>
+        public static string Filter_Fisheye {
+            get {
+                return ResourceManager.GetString("Filter_Fisheye", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gaussian Blur.
+        /// </summary>
+        public static string Filter_GaussianBlur {
+            get {
+                return ResourceManager.GetString("Filter_GaussianBlur", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Grayscale.
+        /// </summary>
+        public static string Filter_Grayscale {
+            get {
+                return ResourceManager.GetString("Filter_Grayscale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Negative.
+        /// </summary>
+        public static string Filter_Negative {
+            get {
+                return ResourceManager.GetString("Filter_Negative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sepia.
+        /// </summary>
+        public static string Filter_Sepia {
+            get {
+                return ResourceManager.GetString("Filter_Sepia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Swap Channels.
+        /// </summary>
+        public static string Filter_SwapChannels {
+            get {
+                return ResourceManager.GetString("Filter_SwapChannels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Freeze.
         /// </summary>
         public static string FreezeButton_Content {
