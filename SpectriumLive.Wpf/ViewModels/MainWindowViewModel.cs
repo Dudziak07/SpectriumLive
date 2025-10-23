@@ -53,11 +53,19 @@ public partial class MainWindowViewModel(
     private string? asciiResult;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ToggleCameraCommand))]
     private int selectedCameraIndex = -1;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoadCamerasCommand))]
     private bool isScanningCameras;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(FreezeCameraCommand))]
+    private bool isCameraRunning;
+
+    [ObservableProperty]
+    private bool isCameraFrozen;
 
     private ImageBuffer? originalImageBuffer;
 
@@ -208,26 +216,54 @@ public partial class MainWindowViewModel(
 
     private bool CanLoadCameras() => !IsScanningCameras;
 
-    [RelayCommand]
     private void StartCamera()
     {
-        if ( SelectedCameraIndex >= 0 )
-        {
-            OriginalImage = null;
-            ProcessedImage = null;
-            cameraFrameBitmap = null;
-            cameraService.StartCamera(SelectedCameraIndex, OnNewCameraFrame);
-        }
+        OriginalImage = null;
+        ProcessedImage = null;
+        cameraFrameBitmap = null;
+        cameraService.StartCamera(SelectedCameraIndex, OnNewCameraFrame);
     }
 
-    [RelayCommand]
     private void StopCamera()
     {
         cameraService.StopCamera();
+        OriginalImage = null;
+        ProcessedImage = null;
+        cameraFrameBitmap = null;
     }
+
+    [RelayCommand(CanExecute = nameof(CanToggleCamera))]
+    private void ToggleCamera()
+    {
+        if ( IsCameraRunning )
+        {
+            StopCamera();
+            IsCameraRunning = false;
+        }
+        else
+        {
+            StartCamera();
+            IsCameraRunning = true;
+        }
+
+        IsCameraFrozen = false;
+    }
+
+    private bool CanToggleCamera() => SelectedCameraIndex >= 0 || IsCameraRunning;
+
+    [RelayCommand(CanExecute = nameof(CanFreezeCamera))]
+    private void FreezeCamera()
+    {
+        IsCameraFrozen = !IsCameraFrozen;
+    }
+
+    private bool CanFreezeCamera() => IsCameraRunning;
 
     private void OnNewCameraFrame(Mat frame)
     {
+        if ( IsCameraFrozen )
+            return;
+
         if ( cameraFrameBitmap is null ||
             cameraFrameBitmap.PixelWidth != frame.Width ||
             cameraFrameBitmap.PixelHeight != frame.Height )
