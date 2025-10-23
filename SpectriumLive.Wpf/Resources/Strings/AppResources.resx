@@ -222,4 +222,7 @@
   <data name="MenuOptions_Header" xml:space="preserve">
     <value>Options</value>
   </data>
+  <data name="MenuClearImage_Header" xml:space="preserve">
+    <value>Clear Image</value>
+  </data>
 </root>

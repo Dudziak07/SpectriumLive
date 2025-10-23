@@ -38,6 +38,7 @@ public partial class MainWindowViewModel(
     public ObservableCollection<CameraDevice> AvailableCameras { get; } = [];
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ClearImageCommand))]
     private ImageSource? originalImage;
 
     [ObservableProperty]
@@ -62,6 +63,7 @@ public partial class MainWindowViewModel(
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(FreezeCameraCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ClearImageCommand))]
     private bool isCameraRunning;
 
     [ObservableProperty]
@@ -277,10 +279,24 @@ public partial class MainWindowViewModel(
         ProcessImageBasedOnSelection();
     }
 
-    partial void OnOriginalImageChanged(ImageSource? value)
+    [RelayCommand(CanExecute = nameof(CanClearImage))]
+    private void ClearImage()
     {
-        ProcessImageBasedOnSelection();
+        if ( IsCameraRunning )
+        {
+            if ( ToggleCameraCommand.CanExecute(null) )
+                ToggleCameraCommand.Execute(null);
+        }
+        else
+        {
+            originalImageBuffer = null;
+            OriginalImage = null;
+        }
     }
+
+    private bool CanClearImage() => IsCameraRunning || OriginalImage is not null;
+
+    partial void OnOriginalImageChanged(ImageSource? value) => ProcessImageBasedOnSelection();
 
     partial void OnProcessedImageChanged(ImageSource? value) => SaveImageCommand.NotifyCanExecuteChanged();
 }

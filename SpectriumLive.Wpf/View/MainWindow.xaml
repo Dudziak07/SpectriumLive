@@ -97,6 +97,10 @@
                     <MenuItem Header="{x:Static res:AppResources.MenuLanguagePolish_Header}" Command="{Binding SetLanguageCommand}" CommandParameter="pl-PL"/>
                     <MenuItem Header="{x:Static res:AppResources.MenuLanguageEnglish_Header}" Command="{Binding SetLanguageCommand}" CommandParameter="en-US"/>
                 </MenuItem>
+
+                <Separator/>
+                
+                <MenuItem Header="{x:Static res:AppResources.MenuClearImage_Header}" Command="{Binding ClearImageCommand}"/>
             </MenuItem>
         </Menu>
 

@@ -232,6 +232,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clear Image.
+        /// </summary>
+        public static string MenuClearImage_Header {
+            get {
+                return ResourceManager.GetString("MenuClearImage_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Language.
         /// </summary>
         public static string MenuLanguage_Header {
