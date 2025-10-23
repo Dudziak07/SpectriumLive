@@ -219,4 +219,7 @@
   <data name="MenuLanguageEnglish_Header" xml:space="preserve">
     <value>_Angielski</value>
   </data>
+  <data name="MenuOptions_Header" xml:space="preserve">
+    <value>Opcje</value>
+  </data>
 </root>

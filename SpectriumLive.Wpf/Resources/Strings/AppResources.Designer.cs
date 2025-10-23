@@ -259,6 +259,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Options.
+        /// </summary>
+        public static string MenuOptions_Header {
+            get {
+                return ResourceManager.GetString("MenuOptions_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Theme.
         /// </summary>
         public static string MenuTheme_Header {
