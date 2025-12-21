@@ -1,4 +1,5 @@
 ﻿using SpectriumLive.Core.Entities;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -8,61 +9,62 @@ public static class ImageConverter
 {
     public static ImageBuffer ToImageBuffer(BitmapSource bitmap)
     {
-        var formattedBitmap = new FormatConvertedBitmap(
-            bitmap,
-            PixelFormats.Bgra32,
-            null,
-            0);
-        var stride = ( formattedBitmap.PixelWidth * formattedBitmap.Format.BitsPerPixel + 7 ) / 8;
-        var pixelBytes = new byte[formattedBitmap.PixelHeight * stride];
+        var formattedBitmap = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
+        int width = formattedBitmap.PixelWidth;
+        int height = formattedBitmap.PixelHeight;
+        int stride = (width * formattedBitmap.Format.BitsPerPixel + 7) / 8;
+        var pixelBytes = new byte[height * stride];
         formattedBitmap.CopyPixels(pixelBytes, stride, 0);
 
-        var pixels = new PixelData[formattedBitmap.PixelWidth * formattedBitmap.PixelHeight];
-        for ( int y = 0; y < formattedBitmap.PixelHeight; y++ )
+        var pixels = new PixelData[width * height];
+
+        Parallel.For(0, height, y =>
         {
-            for ( int x = 0; x < formattedBitmap.PixelWidth; x++ )
+            int rowByteOffset = y * stride;
+            int rowPixelOffset = y * width;
+
+            for (int x = 0; x < width; x++)
             {
-                int pixelIndex = y * formattedBitmap.PixelWidth + x;
-                int byteIndex = y * stride + x * 4;
-                pixels[pixelIndex] = new(
+                int byteIndex = rowByteOffset + x * 4;
+                pixels[rowPixelOffset + x] = new(
                     pixelBytes[byteIndex + 2], // R
                     pixelBytes[byteIndex + 1], // G
-                    pixelBytes[byteIndex + 0], // B
+                    pixelBytes[byteIndex],     // B
                     pixelBytes[byteIndex + 3]  // A
                 );
             }
-        }
+        });
 
-        return new ImageBuffer(formattedBitmap.PixelWidth, formattedBitmap.PixelHeight, pixels);
+        return new ImageBuffer(width, height, pixels);
     }
 
     public static ImageSource ToImageSource(ImageBuffer imageBuffer)
     {
+        int width = imageBuffer.Width;
+        int height = imageBuffer.Height;
         var format = PixelFormats.Bgra32;
-        var stride = imageBuffer.Width * ( format.BitsPerPixel / 8 );
-        var pixelBytes = new byte[imageBuffer.Height * stride];
+        int stride = width * 4;
+        var pixelBytes = new byte[height * stride];
+        var pixels = imageBuffer.Pixels;
 
-        for ( int i = 0; i < imageBuffer.Pixels.Length; i++ )
+        Parallel.For(0, height, y =>
         {
-            int byteIndex = i * 4;
-            pixelBytes[byteIndex + 2] = imageBuffer.Pixels[i].R; // R
-            pixelBytes[byteIndex + 1] = imageBuffer.Pixels[i].G; // G
-            pixelBytes[byteIndex + 0] = imageBuffer.Pixels[i].B; // B
-            pixelBytes[byteIndex + 3] = imageBuffer.Pixels[i].A; // A
-        }
+            int rowByteOffset = y * stride;
+            int rowPixelOffset = y * width;
 
-        var bitmap = new WriteableBitmap(
-            imageBuffer.Width,
-            imageBuffer.Height,
-            96, // DPI X
-            96, // DPI Y
-            format,
-            null);
-        bitmap.WritePixels(new(
-            0, 0, imageBuffer.Width, imageBuffer.Height),
-            pixelBytes,
-            stride,
-            0);
+            for (int x = 0; x < width; x++)
+            {
+                int byteIndex = rowByteOffset + x * 4;
+                var pixel = pixels[rowPixelOffset + x];
+                pixelBytes[byteIndex + 2] = pixel.R;
+                pixelBytes[byteIndex + 1] = pixel.G;
+                pixelBytes[byteIndex] = pixel.B;
+                pixelBytes[byteIndex + 3] = pixel.A;
+            }
+        });
+
+        var bitmap = new WriteableBitmap(width, height, 96, 96, format, null);
+        bitmap.WritePixels(new Int32Rect(0, 0, width, height), pixelBytes, stride, 0);
 
         return bitmap;
     }
