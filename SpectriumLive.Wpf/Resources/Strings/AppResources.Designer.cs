@@ -19,7 +19,7 @@ namespace SpectriumLive.Wpf.Resources.Strings {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class AppResources {
@@ -57,6 +57,51 @@ namespace SpectriumLive.Wpf.Resources.Strings {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Binarization Method:.
+        /// </summary>
+        public static string BinarizationMethod_Header {
+            get {
+                return ResourceManager.GetString("BinarizationMethod_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Manual.
+        /// </summary>
+        public static string BinarizationMethod_Manual {
+            get {
+                return ResourceManager.GetString("BinarizationMethod_Manual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mean Iterative.
+        /// </summary>
+        public static string BinarizationMethod_MeanIterative {
+            get {
+                return ResourceManager.GetString("BinarizationMethod_MeanIterative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Otsu.
+        /// </summary>
+        public static string BinarizationMethod_Otsu {
+            get {
+                return ResourceManager.GetString("BinarizationMethod_Otsu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Percent.
+        /// </summary>
+        public static string BinarizationMethod_PercentBlack {
+            get {
+                return ResourceManager.GetString("BinarizationMethod_PercentBlack", resourceCulture);
             }
         }
         
@@ -412,6 +457,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Percent Black:.
+        /// </summary>
+        public static string PercentBlack_Label {
+            get {
+                return ResourceManager.GetString("PercentBlack_Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Red.
         /// </summary>
         public static string Red {
@@ -480,6 +534,15 @@ namespace SpectriumLive.Wpf.Resources.Strings {
         public static string TextConverters_Header {
             get {
                 return ResourceManager.GetString("TextConverters_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Threshold:.
+        /// </summary>
+        public static string Threshold_Label {
+            get {
+                return ResourceManager.GetString("Threshold_Label", resourceCulture);
             }
         }
     }

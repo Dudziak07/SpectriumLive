@@ -258,4 +258,25 @@
   <data name="Filter_Fisheye" xml:space="preserve">
     <value>Fisheye</value>
   </data>
+  <data name="BinarizationMethod_Header" xml:space="preserve">
+    <value>Binarization Method:</value>
+  </data>
+  <data name="BinarizationMethod_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="BinarizationMethod_PercentBlack" xml:space="preserve">
+    <value>Percent</value>
+  </data>
+  <data name="BinarizationMethod_MeanIterative" xml:space="preserve">
+    <value>Mean Iterative</value>
+  </data>
+  <data name="BinarizationMethod_Otsu" xml:space="preserve">
+    <value>Otsu</value>
+  </data>
+  <data name="Threshold_Label" xml:space="preserve">
+    <value>Threshold:</value>
+  </data>
+  <data name="PercentBlack_Label" xml:space="preserve">
+    <value>Percent Black:</value>
+  </data>
 </root>
