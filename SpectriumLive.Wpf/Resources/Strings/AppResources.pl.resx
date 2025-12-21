@@ -219,4 +219,43 @@
   <data name="MenuLanguageEnglish_Header" xml:space="preserve">
     <value>_Angielski</value>
   </data>
+  <data name="MenuOptions_Header" xml:space="preserve">
+    <value>Opcje</value>
+  </data>
+  <data name="MenuClearImage_Header" xml:space="preserve">
+    <value>Wyczyść obraz</value>
+  </data>
+  <data name="Filter_Ascii" xml:space="preserve">
+    <value>ASCII</value>
+  </data>
+  <data name="Filter_Binary" xml:space="preserve">
+    <value>Binaryzacja</value>
+  </data>
+  <data name="Filter_Grayscale" xml:space="preserve">
+    <value>Skala szarości</value>
+  </data>
+  <data name="Filter_Negative" xml:space="preserve">
+    <value>Negatyw</value>
+  </data>
+  <data name="Filter_Sepia" xml:space="preserve">
+    <value>Sepia</value>
+  </data>
+  <data name="Filter_SwapChannels" xml:space="preserve">
+    <value>Zamiana kanałów</value>
+  </data>
+  <data name="Filter_ChannelFilter" xml:space="preserve">
+    <value>Filtr kanałów</value>
+  </data>
+  <data name="Filter_BoxBlur" xml:space="preserve">
+    <value>Rozmycie pudełkowe</value>
+  </data>
+  <data name="Filter_GaussianBlur" xml:space="preserve">
+    <value>Rozmycie Gaussa</value>
+  </data>
+  <data name="Filter_EdgeDetection" xml:space="preserve">
+    <value>Detekcja krawędzi</value>
+  </data>
+  <data name="Filter_Fisheye" xml:space="preserve">
+    <value>Rybie oko</value>
+  </data>
 </root>
