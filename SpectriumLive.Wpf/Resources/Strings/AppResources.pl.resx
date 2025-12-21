@@ -258,4 +258,25 @@
   <data name="Filter_Fisheye" xml:space="preserve">
     <value>Rybie oko</value>
   </data>
+  <data name="BinarizationMethod_Header" xml:space="preserve">
+    <value>Metoda binaryzacji:</value>
+  </data>
+  <data name="BinarizationMethod_Manual" xml:space="preserve">
+    <value>Ręczny</value>
+  </data>
+  <data name="BinarizationMethod_PercentBlack" xml:space="preserve">
+    <value>Procentowy</value>
+  </data>
+  <data name="BinarizationMethod_MeanIterative" xml:space="preserve">
+    <value>Iteracyjna średnia</value>
+  </data>
+  <data name="BinarizationMethod_Otsu" xml:space="preserve">
+    <value>Otsu</value>
+  </data>
+  <data name="Threshold_Label" xml:space="preserve">
+    <value>Próg:</value>
+  </data>
+  <data name="PercentBlack_Label" xml:space="preserve">
+    <value>Procent czerni:</value>
+  </data>
 </root>
