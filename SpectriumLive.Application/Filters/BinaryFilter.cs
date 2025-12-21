@@ -157,13 +157,16 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        lastHistogram = CalculateHistogram(imageBuffer);
-        lastTotalPixels = imageBuffer.Pixels.Length;
+        var pixels = imageBuffer.Pixels;
+        int length = pixels.Length;
+
+        lastHistogram = CalculateHistogram(pixels);
+        lastTotalPixels = length;
 
         int threshold = SelectedMethod switch
         {
             BinarizationMethod.Manual => ManualThreshold,
-            BinarizationMethod.PercentBlack => CalculateThresholdPercentBlack(lastHistogram, lastTotalPixels),
+            BinarizationMethod.PercentBlack => CalculateThresholdFromPercent(lastHistogram, lastTotalPixels, PercentBlack),
             BinarizationMethod.MeanIterative => CalculateThresholdMeanIterative(lastHistogram),
             BinarizationMethod.Otsu => CalculateThresholdOtsu(lastHistogram, lastTotalPixels),
             _ => ManualThreshold
@@ -172,35 +175,50 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         CalculatedThreshold = threshold;
         SyncUIFromCalculatedThreshold(threshold);
 
-        Parallel.For(0, imageBuffer.Pixels.Length, i =>
+        Parallel.For(0, length, i =>
         {
-            var pixel = imageBuffer.Pixels[i];
+            var pixel = pixels[i];
             var gray = ColorCalculator.ToGrayscale(pixel);
             byte finalValue = gray < threshold ? (byte)0 : (byte)255;
-            imageBuffer.Pixels[i] = new(finalValue, finalValue, finalValue, pixel.A);
+            pixels[i] = new(finalValue, finalValue, finalValue, pixel.A);
         });
     }
 
-    private int[] CalculateHistogram(ImageBuffer imageBuffer)
+    private static int[] CalculateHistogram(PixelData[] pixels)
     {
         int[] histogram = new int[256];
-        object lockObj = new();
+        int length = pixels.Length;
+
+        if (length < 10000)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                var gray = ColorCalculator.ToGrayscale(pixels[i]);
+                histogram[gray]++;
+            }
+            return histogram;
+        }
+
+        int processorCount = Environment.ProcessorCount;
+        int[][] localHistograms = new int[processorCount][];
+        for (int i = 0; i < processorCount; i++)
+            localHistograms[i] = new int[256];
 
         Parallel.ForEach(
-            Partitioner.Create(0, imageBuffer.Pixels.Length),
+            Partitioner.Create(0, length),
             () => new int[256],
             (range, _, localHist) =>
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    var gray = ColorCalculator.ToGrayscale(imageBuffer.Pixels[i]);
+                    var gray = ColorCalculator.ToGrayscale(pixels[i]);
                     localHist[gray]++;
                 }
                 return localHist;
             },
             localHist =>
             {
-                lock (lockObj)
+                lock (histogram)
                 {
                     for (int i = 0; i < 256; i++)
                         histogram[i] += localHist[i];
@@ -210,12 +228,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         return histogram;
     }
 
-    private int CalculateThresholdPercentBlack(int[] histogram, int totalPixels)
-    {
-        return CalculateThresholdFromPercent(histogram, totalPixels, PercentBlack);
-    }
-
-    private int CalculateThresholdFromPercent(int[] histogram, int totalPixels, double percent)
+    private static int CalculateThresholdFromPercent(int[] histogram, int totalPixels, double percent)
     {
         if (totalPixels == 0)
             return 128;
@@ -233,7 +246,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         return 255;
     }
 
-    private double CalculatePercentFromThreshold(int[] histogram, int totalPixels, int threshold)
+    private static double CalculatePercentFromThreshold(int[] histogram, int totalPixels, int threshold)
     {
         if (totalPixels == 0)
             return 0.5;
@@ -247,7 +260,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         return (double)count / totalPixels;
     }
 
-    private int CalculateThresholdMeanIterative(int[] histogram)
+    private static int CalculateThresholdMeanIterative(int[] histogram)
     {
         long sum = 0;
         long totalCount = 0;
@@ -300,7 +313,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         return currentT;
     }
 
-    private int CalculateThresholdOtsu(int[] histogram, int totalPixels)
+    private static int CalculateThresholdOtsu(int[] histogram, int totalPixels)
     {
         if (totalPixels == 0)
             return 128;
@@ -317,12 +330,12 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         for (int t = 0; t < 256; t++)
         {
             weightBackground += histogram[t];
-            
+
             if (weightBackground == 0)
                 continue;
 
             long weightForeground = totalPixels - weightBackground;
-            
+
             if (weightForeground == 0)
                 break;
 
@@ -331,9 +344,8 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             double meanBackground = (double)sumBackground / weightBackground;
             double meanForeground = (double)(sumTotal - sumBackground) / weightForeground;
 
-            double betweenVariance = (double)weightBackground * weightForeground 
-                                   * (meanBackground - meanForeground) 
-                                   * (meanBackground - meanForeground);
+            double diff = meanBackground - meanForeground;
+            double betweenVariance = weightBackground * weightForeground * diff * diff;
 
             if (betweenVariance > maxVariance)
             {
