@@ -9,6 +9,7 @@
         xmlns:local="clr-namespace:SpectriumLive.Wpf"
         
         xmlns:filters="clr-namespace:SpectriumLive.Application.Filters;assembly=SpectriumLive.Application"
+        xmlns:convolutionFilters="clr-namespace:SpectriumLive.Application.Filters.Convolution;assembly=SpectriumLive.Application"
         xmlns:textConverters="clr-namespace:SpectriumLive.Application.TextConverters;assembly=SpectriumLive.Application"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         
@@ -168,6 +169,34 @@
                         </StackPanel>
                     </Grid>
                 </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type convolutionFilters:GaussianBlurFilter}">
+            <StackPanel>
+                <TextBlock Text="{Binding Sigma, StringFormat='Sigma (σ): {0:F2}'}" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=SigmaSlider}"/>
+                    <Slider x:Name="SigmaSlider" Grid.Column="1" Minimum="0.1" Maximum="5.0" Value="{Binding Sigma, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="0.1" TickPlacement="BottomRight" IsMoveToPointEnabled="True"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=SigmaSlider}"/>
+                </Grid>
+
+                <TextBlock Text="{Binding KernelSize, StringFormat='Kernel Size: {0}x{0}'}" HorizontalAlignment="Center" Margin="0,10,0,0" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=KernelSizeSlider}"/>
+                    <Slider x:Name="KernelSizeSlider" Grid.Column="1" Minimum="3" Maximum="15" Value="{Binding KernelSize, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="2" TickPlacement="BottomRight" IsMoveToPointEnabled="True"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=KernelSizeSlider}"/>
+                </Grid>
             </StackPanel>
         </DataTemplate>
     </Window.Resources>
