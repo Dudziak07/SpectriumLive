@@ -69,7 +69,6 @@ public class GaussianBlurFilter : ConvolutionFilterBase, INotifyPropertyChanged
         double normalizationFactor = 1.0 / (2 * Math.PI * sigma2);
 
         for (int y = 0; y < size; y++)
-        {
             for (int x = 0; x < size; x++)
             {
                 int dx = x - center;
@@ -77,7 +76,6 @@ public class GaussianBlurFilter : ConvolutionFilterBase, INotifyPropertyChanged
                 
                 kernel[y, x] = normalizationFactor * Math.Exp(-(dx * dx + dy * dy) / (2 * sigma2));
             }
-        }
 
         return kernel;
     }
@@ -88,12 +86,8 @@ public class GaussianBlurFilter : ConvolutionFilterBase, INotifyPropertyChanged
         int size = kernel.GetLength(0);
         
         for (int y = 0; y < size; y++)
-        {
             for (int x = 0; x < size; x++)
-            {
                 sum += kernel[y, x];
-            }
-        }
 
         return sum > 0 ? 1.0 / sum : 1.0;
     }
