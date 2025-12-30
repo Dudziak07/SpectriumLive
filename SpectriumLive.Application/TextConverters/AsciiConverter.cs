@@ -53,7 +53,7 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
 
     public string Convert(ImageBuffer imageBuffer)
     {
-        char[] asciiChars = asciiMode switch
+        string asciiChars = asciiMode switch
         {
             AsciiMode.Binary => AsciiCharacterRamps.Binary,
             AsciiMode.Simple => AsciiCharacterRamps.Simple,
