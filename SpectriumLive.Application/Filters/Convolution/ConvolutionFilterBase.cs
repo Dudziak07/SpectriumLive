@@ -51,9 +51,9 @@ public abstract class ConvolutionFilterBase : IFilter
                     sumB = Math.Abs(sumB);
                 }
 
-                byte finalR = (byte)Math.Max(0, Math.Min(255, Factor * sumR + Bias));
-                byte finalG = (byte)Math.Max(0, Math.Min(255, Factor * sumG + Bias));
-                byte finalB = (byte)Math.Max(0, Math.Min(255, Factor * sumB + Bias));
+                byte finalR = (byte)Math.Clamp(Factor * sumR + Bias, byte.MinValue, byte.MaxValue);
+                byte finalG = (byte)Math.Clamp(Factor * sumG + Bias, byte.MinValue, byte.MaxValue);
+                byte finalB = (byte)Math.Clamp(Factor * sumB + Bias, byte.MinValue, byte.MaxValue);
 
                 destinationPixels[y * width + x] = new PixelData(finalR, finalG, finalB, sourcePixels[y * width + x].A);
             }
