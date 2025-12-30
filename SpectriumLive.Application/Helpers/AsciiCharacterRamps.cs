@@ -1,21 +1,8 @@
 ﻿namespace SpectriumLive.Application.Helpers;
+
 public static class AsciiCharacterRamps
 {
-    public static readonly char[] Binary = [
-        '#', ' '
-    ];
-
-    public static readonly char[] Simple = [
-        '#', '@', '%', '=', '+', '*', ':', '-', '.', ' '
-    ];
-
-    public static readonly char[] Full = [
-        '$', '@', 'B', 'P', 'W', 'M', 'Q', 'H', 'D', 'k',
-        'h', 'q', 'd', 'p', 'b', 'w', 'm', 'Z', '0', 'O',
-        'L', 'C', 'J', 'U', 'Y', 'X', 'z', 'c', 'v', 'u',
-        'n', 'x', 'r', 'j', 'f', 't', '/', '\\', '|', '(',
-        ')', '1', '{', '}', '[', ']', '?', '-', '_', '+',
-        '~', '<', '>', 'i', '!', 'l', 'I', ';', ':', ',',
-        '"', '^', '`', '\'', '.', ' '
-    ];
+    public const string Binary = "# ";
+    public const string Simple = "#@%=+*:-. ";
+    public const string Full = @"$@BPWMQHDkhqdpbwmZ0OLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,""^`'. ";
 }
