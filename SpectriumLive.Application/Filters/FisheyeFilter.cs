@@ -48,15 +48,15 @@ public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChan
                 {
                     double theta = Math.Atan2(dy, dx);
 
-                    double newR = Strength >= 0
+                    double distortedR = Strength >= 0
                         ? Math.Pow(r, 1 + Strength)
                         : Math.Pow(r, 1.0 / ( 1 - Strength ));
 
-                    double srcX = centerX + newR * radius * Math.Cos(theta);
-                    double srcY = centerY + newR * radius * Math.Sin(theta);
+                    double srcX = centerX + distortedR * radius * Math.Cos(theta);
+                    double srcY = centerY + distortedR * radius * Math.Sin(theta);
 
-                    int ix = (int)Math.Clamp((int)Math.Round(srcX), 0, width - 1);
-                    int iy = (int)Math.Clamp((int)Math.Round(srcY), 0, height - 1);
+                    int ix = Math.Clamp((int)(srcX + 0.5), 0, width - 1);
+                    int iy = Math.Clamp((int)(srcY + 0.5), 0, height - 1);
 
                     destination[y * width + x] = source[iy * width + ix];
                 }
