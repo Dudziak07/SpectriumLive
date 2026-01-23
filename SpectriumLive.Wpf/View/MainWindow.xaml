@@ -16,7 +16,8 @@
         mc:Ignorable="d"
         Title="SpectriumLive"
         Height="600" Width="800"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Icon="/Resources/Icons/Parrot_RG.ico">
 
     <Window.InputBindings>
         <KeyBinding Command="{Binding SaveImageCommand}"
