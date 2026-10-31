@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using SpectriumLive.Application.Contracts;
 using SpectriumLive.Application.Services;
+using SpectriumLive.Infrastructure.Services;
 using SpectriumLive.Wpf.Services;
 using SpectriumLive.Wpf.View;
 using SpectriumLive.Wpf.ViewModels;
@@ -26,6 +27,7 @@ public partial class App : System.Windows.Application
     {
         services
             // Services
+            .AddSingleton<ICameraDeviceEnumerator, DirectShowCameraEnumerator>()
             .AddSingleton<ImageProcessingService>()
             .AddSingleton<CameraService>()
             .AddSingleton<ThemeService>()
@@ -47,5 +49,10 @@ public partial class App : System.Windows.Application
 
         base.OnStartup(e);
     }
-}
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        serviceProvider.Dispose();
+        base.OnExit(e);
+    }
+}

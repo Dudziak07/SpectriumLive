@@ -1,11 +1,13 @@
-﻿using AForge.Video.DirectShow;
 using OpenCvSharp;
+using SpectriumLive.Application.Contracts;
 using SpectriumLive.Core.Entities;
 using System.Collections.ObjectModel;
 
 namespace SpectriumLive.Wpf.Services;
-public class CameraService
+
+public class CameraService(ICameraDeviceEnumerator cameraEnumerator)
 {
+    private readonly ICameraDeviceEnumerator cameraEnumerator = cameraEnumerator;
     private VideoCapture? videoCapture;
     private CancellationTokenSource? cancellationTokenSource;
     private Task? cameraTask;
@@ -14,14 +16,8 @@ public class CameraService
     {
         return Task.Run(() =>
         {
-            var cameras = new ObservableCollection<CameraDevice>();
-            var videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-
-            for ( int i = 0; i < videoDevices.Count; i++ )
-            {
-                cameras.Add(new CameraDevice(i, videoDevices[i].Name));
-            }
-            return cameras;
+            var cameras = cameraEnumerator.GetAvailableCameras();
+            return new ObservableCollection<CameraDevice>(cameras);
         });
     }
 
@@ -33,6 +29,7 @@ public class CameraService
         if ( !videoCapture.IsOpened() )
         {
             videoCapture.Dispose();
+            videoCapture = null;
             return;
         }
 
@@ -45,13 +42,19 @@ public class CameraService
 
             while ( !token.IsCancellationRequested )
             {
+                if ( videoCapture is null || !videoCapture.IsOpened() )
+                    break;
+
                 videoCapture.Read(frame);
 
                 if ( !frame.Empty() )
                 {
-                    App.Current.Dispatcher.Invoke(() => onNewFrame(frame));
+                    App.Current?.Dispatcher.Invoke(() => onNewFrame(frame));
                 }
-                await Task.Delay(16, token);
+                else
+                {
+                    await Task.Delay(10, token);
+                }
             }
         }, token);
     }
@@ -67,9 +70,7 @@ public class CameraService
         catch ( OperationCanceledException )
         {
         }
-        catch ( AggregateException ex ) when ( ex.InnerExceptions
-            .OfType<TaskCanceledException>()
-            .Any() )
+        catch ( AggregateException ex ) when ( ex.InnerExceptions.OfType<TaskCanceledException>().Any() )
         {
         }
 
