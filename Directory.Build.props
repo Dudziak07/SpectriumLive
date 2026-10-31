@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Filip Dudziec</Authors>
+    <Company>Dudziak07</Company>
+    <Product>SpectriumLive</Product>
+    <RepositoryUrl>https://github.com/Dudziak07/SpectriumLive</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>
+
