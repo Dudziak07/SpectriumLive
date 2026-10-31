@@ -78,17 +78,22 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
             sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
             int rowOffset = sourceY * imageBuffer.Width;
 
-            var rowBuilder = new StringBuilder(widthInBlocks);
-            for ( int x = 0; x < widthInBlocks; x++ )
+            rows[y] = string.Create(widthInBlocks, (rowOffset, imageBuffer, validBlockSize, asciiChars, maxCharIndex), static (span, state) =>
             {
-                int sourceX = Math.Min(x * validBlockSize, imageBuffer.Width - 1);
-                var pixel = imageBuffer.Pixels[rowOffset + sourceX];
-                byte grayValue = ColorCalculator.ToGrayscale(pixel);
+                var (rOffset, imgBuffer, vBlockSize, chars, maxIdx) = state;
+                var pixels = imgBuffer.Pixels;
+                int imgWidth = imgBuffer.Width;
 
-                int index = (int)Math.Round(grayValue / 255.0 * maxCharIndex);
-                rowBuilder.Append(asciiChars[index]);
-            }
-            rows[y] = rowBuilder.ToString();
+                for ( int x = 0; x < span.Length; x++ )
+                {
+                    int sourceX = Math.Min(x * vBlockSize, imgWidth - 1);
+                    var pixel = pixels[rOffset + sourceX];
+                    byte grayValue = ColorCalculator.ToGrayscale(pixel);
+
+                    int index = (int)Math.Round(grayValue / 255.0 * maxIdx);
+                    span[x] = chars[index];
+                }
+            });
         });
 
         return string.Join(Environment.NewLine, rows) + Environment.NewLine;

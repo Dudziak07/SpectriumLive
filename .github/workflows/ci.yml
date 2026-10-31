@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-and-test:
-    name: Build & Test (.NET 9)
+    name: Build & Test (.NET 10)
     runs-on: windows-latest
     timeout-minutes: 15
 
@@ -45,7 +45,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@3951f0dfe7a07e2313ec93c75700083e2005cbab # v4.3.0
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: "10.0.x"
 
       - name: Cache NuGet packages
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
