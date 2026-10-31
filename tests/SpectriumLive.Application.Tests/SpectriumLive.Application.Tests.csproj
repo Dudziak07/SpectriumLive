@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SpectriumLive.Application\SpectriumLive.Application.csproj" />
     <ProjectReference Include="..\..\SpectriumLive.Core\SpectriumLive.Core.csproj" />
+    <ProjectReference Include="..\..\SpectriumLive.Infrastructure\SpectriumLive.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

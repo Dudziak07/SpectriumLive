@@ -23,7 +23,7 @@ public class DirectShowCameraEnumerator : ICameraDeviceEnumerator
 
         try
         {
-            devEnum = (ICreateDevEnum)new CreateDevEnum();
+            devEnum = (ICreateDevEnum)new SystemDeviceEnum();
             var category = VideoInputDeviceCategory;
             int hr = devEnum.CreateClassEnumerator(ref category, out enumMoniker, 0);
 
@@ -83,10 +83,10 @@ public class DirectShowCameraEnumerator : ICameraDeviceEnumerator
         return devices;
     }
 
-    [ComImport, Guid("29840822-5B84-11D0-BD3B-00A0C911CE86")]
-    private class CreateDevEnum;
+    [ComImport, Guid("62be5d10-60eb-11d0-bd3b-00a0c911ce86")]
+    private class SystemDeviceEnum;
 
-    [ComImport, Guid("2984082A-5B84-11D0-BD3B-00A0C911CE86"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [ComImport, Guid("29840822-5B84-11D0-BD3B-00A0C911CE86"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface ICreateDevEnum
     {
         [PreserveSig]
