@@ -1,0 +1,77 @@
+name: Nightly Security Audit
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Dependency Vulnerability Audit
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@3951f0dfe7a07e2313ec93c75700083e2005cbab # v4.3.0
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore Dependencies
+        run: dotnet restore SpectriumLive.sln
+
+      - name: Audit NuGet Packages
+        id: nuget_audit
+        run: |
+          echo "Scanning NuGet packages for vulnerabilities..."
+          dotnet list SpectriumLive.sln package --vulnerable --include-transitive > nuget_vulns.txt 2>&1 || true
+          cat nuget_vulns.txt
+          if grep -qi "has the following vulnerable packages\|znaleziono następujące pakiety podatne" nuget_vulns.txt; then
+            echo "has_vulns=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_vulns=false" >> "$GITHUB_OUTPUT"
+            echo "No NuGet vulnerabilities detected."
+          fi
+
+      - name: Report Vulnerabilities via GitHub Issue
+        if: steps.nuget_audit.outputs.has_vulns == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          ISSUE_TITLE="Automated Security Alert: Dependency Vulnerabilities Detected"
+          cat << 'EOF' > issue_body.md
+          ### ⚠️ Automated Security Alert: High/Critical Dependency Vulnerabilities Detected
+
+          A scheduled nightly dependency audit on `main` detected vulnerable packages.
+
+          #### Scan Details:
+          - **Trigger**: Automated Nightly Schedule
+          - **Repository**: SpectriumLive
+          EOF
+
+          echo -e "\n#### 📦 NuGet (.NET) Vulnerabilities:\n\`\`\`" >> issue_body.md
+          cat nuget_vulns.txt >> issue_body.md
+          echo -e "\`\`\`" >> issue_body.md
+
+          EXISTING_ISSUE=$(gh issue list --repo "$REPO" --search "$ISSUE_TITLE" --state open --json number --jq '.[0].number')
+
+          if [ -n "$EXISTING_ISSUE" ]; then
+            echo "Updating existing open issue #$EXISTING_ISSUE..."
+            gh issue comment "$EXISTING_ISSUE" --repo "$REPO" --body-file issue_body.md
+          else
+            echo "Creating new security issue..."
+            gh issue create --repo "$REPO" --title "$ISSUE_TITLE" --body-file issue_body.md --label "security" || \
+            gh issue create --repo "$REPO" --title "$ISSUE_TITLE" --body-file issue_body.md
+          fi
+
+          exit 1
