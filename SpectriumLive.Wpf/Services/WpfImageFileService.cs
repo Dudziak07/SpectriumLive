@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using SpectriumLive.Application.Contracts;
 using SpectriumLive.Core.Entities;
 using SpectriumLive.Wpf.Converters;
@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace SpectriumLive.Wpf.Services;
+
 public class WpfImageFileService : IImageFileService
 {
     public ImageBuffer? LoadImage()
@@ -44,8 +45,18 @@ public class WpfImageFileService : IImageFileService
         if ( saveFileDialog.ShowDialog() is true )
         {
             var imageSource = ImageConverter.ToImageSource(imageBuffer);
-            BitmapEncoder encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(imageSource as BitmapSource));
+            string extension = Path.GetExtension(saveFileDialog.FileName).ToLowerInvariant();
+            BitmapEncoder encoder = extension switch
+            {
+                ".jpg" or ".jpeg" => new JpegBitmapEncoder(),
+                ".bmp" => new BmpBitmapEncoder(),
+                _ => new PngBitmapEncoder()
+            };
+
+            if ( imageSource is BitmapSource bitmapSource )
+            {
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+            }
 
             using var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create);
             encoder.Save(fileStream);

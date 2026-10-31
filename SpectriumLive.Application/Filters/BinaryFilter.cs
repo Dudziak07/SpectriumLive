@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Application.Helpers;
+using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 using System.Collections.Concurrent;
@@ -198,11 +198,6 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             }
             return histogram;
         }
-
-        int processorCount = Environment.ProcessorCount;
-        int[][] localHistograms = new int[processorCount][];
-        for (int i = 0; i < processorCount; i++)
-            localHistograms[i] = new int[256];
 
         Parallel.ForEach(
             Partitioner.Create(0, length),

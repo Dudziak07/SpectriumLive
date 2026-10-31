@@ -11,7 +11,6 @@
         xmlns:filters="clr-namespace:SpectriumLive.Application.Filters;assembly=SpectriumLive.Application"
         xmlns:convolutionFilters="clr-namespace:SpectriumLive.Application.Filters.Convolution;assembly=SpectriumLive.Application"
         xmlns:textConverters="clr-namespace:SpectriumLive.Application.TextConverters;assembly=SpectriumLive.Application"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         
         mc:Ignorable="d"
         Title="SpectriumLive"

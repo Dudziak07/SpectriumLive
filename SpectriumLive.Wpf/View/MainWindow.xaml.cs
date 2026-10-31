@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Wpf.ViewModels;
+using SpectriumLive.Wpf.ViewModels;
 using System.ComponentModel;
 using System.Windows;
 
@@ -19,7 +19,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
-        if ( DataContext is MainWindowViewModel viewModel )
+        if ( DataContext is MainWindowViewModel viewModel && viewModel.IsCameraRunning )
         {
             if ( viewModel.ToggleCameraCommand.CanExecute(null) )
             {
