@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Application.Helpers;
+using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 using System.ComponentModel;
@@ -70,22 +70,22 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
             return string.Empty;
 
         var rows = new string[heightInBlocks];
+        int maxCharIndex = asciiChars.Length - 1;
 
         Parallel.For(0, heightInBlocks, y =>
         {
+            int sourceY = (int)( y / FontAspectRatio * validBlockSize );
+            sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
+            int rowOffset = sourceY * imageBuffer.Width;
+
             var rowBuilder = new StringBuilder(widthInBlocks);
             for ( int x = 0; x < widthInBlocks; x++ )
             {
-                int sourceX = x * validBlockSize;
-                int sourceY = (int)( y / FontAspectRatio * validBlockSize );
-
-                sourceX = Math.Min(sourceX, imageBuffer.Width - 1);
-                sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
-
-                var pixel = imageBuffer.Pixels[sourceY * imageBuffer.Width + sourceX];
+                int sourceX = Math.Min(x * validBlockSize, imageBuffer.Width - 1);
+                var pixel = imageBuffer.Pixels[rowOffset + sourceX];
                 byte grayValue = ColorCalculator.ToGrayscale(pixel);
 
-                int index = (int)Math.Round(grayValue / 255.0 * ( asciiChars.Length - 1 ));
+                int index = (int)Math.Round(grayValue / 255.0 * maxCharIndex);
                 rowBuilder.Append(asciiChars[index]);
             }
             rows[y] = rowBuilder.ToString();

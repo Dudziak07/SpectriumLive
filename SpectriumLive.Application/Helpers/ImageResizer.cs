@@ -1,7 +1,8 @@
-﻿using SpectriumLive.Core.Entities;
+using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Helpers;
-public class ImageResizer
+
+public static class ImageResizer
 {
     private const double AspectRatioCorrection = 0.5;
 
@@ -19,17 +20,17 @@ public class ImageResizer
 
         Parallel.For(0, newHeight, y =>
         {
+            int sourceY = Math.Min((int)Math.Round((double)y / newHeight * source.Height), source.Height - 1);
+            int sourceRowOffset = sourceY * source.Width;
+            int destRowOffset = y * newWidth;
+
             for ( int x = 0; x < newWidth; x++ )
             {
-                int sourceX = (int)Math.Round((double)x / newWidth * source.Width);
-                int sourceY = (int)Math.Round((double)y / newHeight * source.Height);
-
-                sourceX = Math.Min(sourceX, source.Width - 1);
-                sourceY = Math.Min(sourceY, source.Height - 1);
-
-                resizedPixels[y * newWidth + x] = source.Pixels[sourceY * source.Width + sourceX];
+                int sourceX = Math.Min((int)Math.Round((double)x / newWidth * source.Width), source.Width - 1);
+                resizedPixels[destRowOffset + x] = source.Pixels[sourceRowOffset + sourceX];
             }
         });
+
         return new(newWidth, newHeight, resizedPixels);
     }
 }

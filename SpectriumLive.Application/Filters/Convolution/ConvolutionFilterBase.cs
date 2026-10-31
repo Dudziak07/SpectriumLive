@@ -1,7 +1,8 @@
-﻿using SpectriumLive.Core;
+using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 
 namespace SpectriumLive.Application.Filters.Convolution;
+
 public abstract class ConvolutionFilterBase : IFilter
 {
     public abstract string Name { get; }
@@ -30,12 +31,14 @@ public abstract class ConvolutionFilterBase : IFilter
 
                 for ( int ky = 0; ky < kernelSize; ky++ )
                 {
+                    int pixelY = y + ky - kernelOffset;
+                    int rowOffset = pixelY * width;
+
                     for ( int kx = 0; kx < kernelSize; kx++ )
                     {
                         int pixelX = x + kx - kernelOffset;
-                        int pixelY = y + ky - kernelOffset;
 
-                        var p = sourcePixels[pixelY * width + pixelX];
+                        var p = sourcePixels[rowOffset + pixelX];
                         var k = Kernel[ky, kx];
 
                         sumR += p.R * k;
