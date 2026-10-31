@@ -42,16 +42,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore dependencies
-        run: dotnet restore SpectriumLive.sln
-
       - name: Publish Windows x64 Application
         run: >-
           dotnet publish SpectriumLive.Wpf/SpectriumLive.Wpf.csproj
           --configuration Release
           --runtime win-x64
           --self-contained true
-          --no-restore
           -p:PublishSingleFile=true
           -p:IncludeNativeLibrariesForSelfExtract=true
           -p:EnableCompressionInSingleFile=true
