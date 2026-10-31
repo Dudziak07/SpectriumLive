@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <img src="SpectriumLive.Wpf/Resources/Icons/Parrot_RG.png" alt="SpectriumLive Logo" width="128" />
 
@@ -65,14 +65,14 @@ The application UI is built with WPF on **.NET 9**, adopting the **MVVM** patter
 
 ## Architecture
 
-The solution follows Clean Architecture principles:
+The solution follows **Clean Architecture** principles combined with the **MVVM (Model-View-ViewModel)** design pattern:
 
 ```
 SpectriumLive/
-├── SpectriumLive.Core/              # Domain models (PixelData, ImageBuffer, interfaces)
-├── SpectriumLive.Application/       # Algorithm implementations (Filters, Convolutions, ASCII)
-├── SpectriumLive.Infrastructure/    # OS hardware integration (DirectShow camera enumerator)
-├── SpectriumLive.Wpf/               # Presentation layer (MVVM, Views, ViewModels, Services)
+├── SpectriumLive.Core/              # Domain Layer: core entities (PixelData, ImageBuffer), interfaces (IFilter)
+├── SpectriumLive.Application/       # Application Layer: filtering algorithms, convolutions, ASCII engine, contracts
+├── SpectriumLive.Infrastructure/    # Infrastructure Layer: hardware and OS interop (DirectShow camera enumeration)
+├── SpectriumLive.Wpf/               # Presentation Layer: MVVM (CommunityToolkit.Mvvm), views, viewmodels, themes
 └── tests/
     └── SpectriumLive.Application.Tests/  # 45 xUnit tests verifying mathematical filter logic
 ```
