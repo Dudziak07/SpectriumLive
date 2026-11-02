@@ -3,8 +3,8 @@
     <Authors>Filip Dudziec</Authors>
     <Company>Dudziak07</Company>
     <Product>SpectriumLive</Product>
+    <Copyright>Copyright (c) 2025-2026 Filip Dudziec</Copyright>
     <RepositoryUrl>https://github.com/Dudziak07/SpectriumLive</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 </Project>
-
