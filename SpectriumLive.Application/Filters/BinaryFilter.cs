@@ -199,6 +199,8 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             return histogram;
         }
 
+        Lock syncLock = new();
+
         Parallel.ForEach(
             Partitioner.Create(0, length),
             () => new int[256],
@@ -213,7 +215,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             },
             localHist =>
             {
-                lock (histogram)
+                lock (syncLock)
                 {
                     for (int i = 0; i < 256; i++)
                         histogram[i] += localHist[i];

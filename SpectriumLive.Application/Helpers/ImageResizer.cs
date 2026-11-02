@@ -18,6 +18,12 @@ public static class ImageResizer
 
         var resizedPixels = new PixelData[newWidth * newHeight];
 
+        int[] xMap = new int[newWidth];
+        for ( int x = 0; x < newWidth; x++ )
+        {
+            xMap[x] = Math.Min((int)Math.Round((double)x / newWidth * source.Width), source.Width - 1);
+        }
+
         Parallel.For(0, newHeight, y =>
         {
             int sourceY = Math.Min((int)Math.Round((double)y / newHeight * source.Height), source.Height - 1);
@@ -26,8 +32,7 @@ public static class ImageResizer
 
             for ( int x = 0; x < newWidth; x++ )
             {
-                int sourceX = Math.Min((int)Math.Round((double)x / newWidth * source.Width), source.Width - 1);
-                resizedPixels[destRowOffset + x] = source.Pixels[sourceRowOffset + sourceX];
+                resizedPixels[destRowOffset + x] = source.Pixels[sourceRowOffset + xMap[x]];
             }
         });
 
