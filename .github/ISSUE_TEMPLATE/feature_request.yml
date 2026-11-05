@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest an idea or new filter for SpectriumLive.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new filter, performance optimization, or UI feature? Let us know!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or limitation?
+    validations:
+      required: false
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / Feature
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      options:
+        - Image Filter Algorithm
+        - Camera & Video Streaming
+        - Performance Optimization
+        - User Interface / Styling
+        - Documentation / Testing
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
