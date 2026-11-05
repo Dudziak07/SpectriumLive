@@ -6,11 +6,12 @@
 
 **Real-time desktop application for transforming images and live camera feeds using custom graphics filters.**
 
+[![Latest Release](https://img.shields.io/github/v/release/Dudziak07/SpectriumLive?style=flat-square&logo=github&label=Release)](https://github.com/Dudziak07/SpectriumLive/releases/latest)
 [![CI](https://github.com/Dudziak07/SpectriumLive/actions/workflows/ci.yml/badge.svg)](https://github.com/Dudziak07/SpectriumLive/actions/workflows/ci.yml)
-[![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![WPF](https://img.shields.io/badge/Platform-WPF%20Windows-0078D7?logo=windows&logoColor=white)](https://learn.microsoft.com/dotnet/desktop/wpf/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.txt)
-[![NuGet](https://img.shields.io/nuget/v/SpectriumLive.Styles?label=SpectriumLive.Styles&color=004880&logo=nuget)](https://www.nuget.org/packages/SpectriumLive.Styles/)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![WPF](https://img.shields.io/badge/Platform-WPF%20Windows-0078D7?style=flat-square&logo=windows&logoColor=white)](https://learn.microsoft.com/dotnet/desktop/wpf/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE.txt)
+[![NuGet](https://img.shields.io/nuget/v/SpectriumLive.Styles?label=SpectriumLive.Styles&color=004880&logo=nuget&style=flat-square)](https://www.nuget.org/packages/SpectriumLive.Styles/)
 
 </div>
 
@@ -20,9 +21,19 @@
 
 **SpectriumLive** is a modern Windows desktop application designed for real-time video stream filtering and still image processing. It implements custom image manipulation algorithms from scratch, allowing users to apply complex mathematical filters to live webcam feeds or loaded image files at high frame rates.
 
-The application UI is built with WPF on **.NET 9**, adopting the **MVVM** pattern with [CommunityToolkit.Mvvm](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/) and styled with [`SpectriumLive.Styles`](https://github.com/Dudziak07/SpectriumLive.Styles).
+The application UI is built with WPF on **.NET 10**, adopting the **MVVM** pattern with [CommunityToolkit.Mvvm](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/) and styled with [`SpectriumLive.Styles`](https://github.com/Dudziak07/SpectriumLive.Styles).
 
 > 🎓 **Academic Note**: This project was developed as an Engineering Thesis titled **"Desktop software for transforming images using graphics filters"** (*Aplikacja desktopowa do przekształcania obrazu za pomocą filtrów graficznych*), defended on **February 2, 2026** at the Faculty of Computer Science, Bialystok University of Technology (Politechnika Białostocka).
+
+---
+
+## 💡 Technical Highlights & Engineering Decisions
+
+- ⚡ **Zero-Allocation Buffer Generation:** The real-time ASCII engine avoids repetitive `StringBuilder` heap allocations via direct `string.Create` buffer generation.
+- 🔒 **Modern .NET 10 Synchronization:** Upgraded critical histogram locks in binarization algorithms to the dedicated `System.Threading.Lock` primitive, reducing thread contention.
+- 🏎️ **Parallelized Image Processing:** Hot pixel loops are parallelized across CPU cores using `Parallel.For`, with hoisted loop invariants and trigonometric replacements in distortion filters (such as Fisheye) to maximize frame rates.
+- 🔌 **Native DirectShow COM Interop:** Replaced legacy, unmaintained dependencies (such as AForge) with a clean, native COM interop layer (`ICreateDevEnum`, `IPropertyBag`) in `SpectriumLive.Infrastructure`, achieving a zero-warning build (`0 Errors, 0 Warnings`).
+- 🛡️ **Hardened DevOps & Automated Releases:** CI/CD workflows are secured with SHA-pinned GitHub Actions, automated single-file Windows x64 binaries published with SHA-256 checksums, and nightly automated secret & dependency vulnerability scans (Gitleaks).
 
 ---
 
@@ -74,11 +85,11 @@ SpectriumLive/
 ├── SpectriumLive.Infrastructure/    # Infrastructure Layer: hardware and OS interop (DirectShow camera enumeration)
 ├── SpectriumLive.Wpf/               # Presentation Layer: MVVM (CommunityToolkit.Mvvm), views, viewmodels, themes
 └── tests/
-    └── SpectriumLive.Application.Tests/  # 45 xUnit tests verifying mathematical filter logic
+    └── SpectriumLive.Application.Tests/  # 46 xUnit tests verifying mathematical filter logic
 ```
 
 ### Key Technologies
-- **Runtime**: .NET 9 (`net9.0`, `net9.0-windows`)
+- **Runtime**: .NET 10 (`net10.0`, `net10.0-windows`)
 - **UI Framework**: Windows Presentation Foundation (WPF)
 - **MVVM**: `CommunityToolkit.Mvvm` (source generators)
 - **Dependency Injection**: `Microsoft.Extensions.DependencyInjection`
@@ -90,13 +101,19 @@ SpectriumLive/
 
 ## Getting Started
 
-### Prerequisites
+### Pre-built Executable (Recommended)
+
+Download the standalone, self-contained single-file executable (no .NET runtime installation required):
+👉 **[Download SpectriumLive-win-x64.zip](https://github.com/Dudziak07/SpectriumLive/releases/latest)**
+
+### Build from Source
+
+#### Prerequisites
 - Windows 10 or 11 (x64)
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - Webcam (optional, for live camera mode)
 
-### Build & Run
-
+#### Build & Run
 Clone the repository:
 ```bash
 git clone https://github.com/Dudziak07/SpectriumLive.git
@@ -108,8 +125,7 @@ Restore and run the WPF application:
 dotnet run --project SpectriumLive.Wpf
 ```
 
-### Running Tests
-
+#### Running Tests
 Execute the unit test suite:
 ```bash
 dotnet test
