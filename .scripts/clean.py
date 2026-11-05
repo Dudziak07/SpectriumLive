@@ -7,7 +7,7 @@ import shutil
 import stat
 from pathlib import Path
 
-TARGET_DIRS = {"bin", "obj", "TestResults"}
+TARGET_DIRS = {"bin", "obj", "TestResults", "publish"}
 IGNORE_DIRS = {".git", ".idea", ".vscode", ".venv", ".scripts"}
 
 

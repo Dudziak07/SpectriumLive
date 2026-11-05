@@ -131,6 +131,12 @@ Execute the unit test suite:
 dotnet test
 ```
 
+#### Cleaning Build Artifacts
+Clean all local `bin/`, `obj/`, `publish/`, and test output directories:
+```bash
+python .scripts/clean.py
+```
+
 ---
 
 ## Author
