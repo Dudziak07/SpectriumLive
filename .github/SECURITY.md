@@ -24,3 +24,4 @@ Please include:
 - Any proposed remediation or mitigation steps.
 
 You will receive an initial response within 48 hours acknowledging receipt of the report.
+

@@ -75,3 +75,4 @@ Every commit message must be a **single line** with no extra body or metadata:
 - **Code Style:** Respect the settings defined in [.editorconfig](.editorconfig).
 - **Warnings:** The project enforces zero compilation warnings. Ensure your changes introduce no new warnings.
 - **Unit Tests:** Add unit tests in `tests/SpectriumLive.Application.Tests` for any new algorithmic logic or converters.
+
