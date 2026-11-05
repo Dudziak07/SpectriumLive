@@ -6,7 +6,7 @@
 
 **Real-time desktop application for transforming images and live camera feeds using custom graphics filters.**
 
-[![Latest Release](https://img.shields.io/badge/Release-v1.2.0-blue?style=flat-square&logo=github)](https://github.com/Dudziak07/SpectriumLive/releases/latest)
+[![Latest Release](https://img.shields.io/badge/Release-v1.2.1-blue?style=flat-square&logo=github)](https://github.com/Dudziak07/SpectriumLive/releases/latest)
 [![CI](https://github.com/Dudziak07/SpectriumLive/actions/workflows/ci.yml/badge.svg)](https://github.com/Dudziak07/SpectriumLive/actions/workflows/ci.yml)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square)](https://dotnet.microsoft.com/)
 [![WPF](https://img.shields.io/badge/Platform-WPF%20Windows-0078D7?style=flat-square&logo=windows&logoColor=white)](https://learn.microsoft.com/dotnet/desktop/wpf/)
