@@ -65,10 +65,59 @@ jobs:
         run: dotnet build SpectriumLive.sln --configuration Release --no-restore
 
       - name: Run unit tests
-        run: dotnet test SpectriumLive.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=results.trx"
+        run: dotnet test SpectriumLive.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=results.trx" --collect:"XPlat Code Coverage"
 
       - name: Publish Test Summary
         if: success() || failure()
         uses: test-summary/action@37b508cfee6d4d080eedd00b5bb240a6a784a6a5 # v2.4
         with:
           paths: 'tests/**/TestResults/*.trx'
+
+      - name: Publish Code Coverage Summary
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          $covFiles = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml" tests -ErrorAction SilentlyContinue
+          if (-not $covFiles) {
+            Write-Host "No coverage.cobertura.xml file found."
+            exit 0
+          }
+          [xml]$cov = Get-Content $covFiles[0].FullName
+          $lineRate = [math]::Round([double]$cov.coverage.'line-rate' * 100, 2)
+          $branchRate = [math]::Round([double]$cov.coverage.'branch-rate' * 100, 2)
+          $linesCovered = $cov.coverage.'lines-covered'
+          $linesValid = $cov.coverage.'lines-valid'
+          $branchesCovered = $cov.coverage.'branches-covered'
+          $branchesValid = $cov.coverage.'branches-valid'
+
+          $summary = @"
+          ### 📊 Code Coverage Summary
+
+          | Metric | Coverage | Details |
+          | :--- | :--- | :--- |
+          | **Line Coverage** | **$lineRate%** | $linesCovered / $linesValid lines |
+          | **Branch Coverage** | **$branchRate%** | $branchesCovered / $branchesValid branches |
+
+          <details>
+          <summary><b>Coverage by Package</b></summary>
+
+          | Package | Line Coverage | Branch Coverage |
+          | :--- | :--- | :--- |
+          "@
+
+          foreach ($pkg in $cov.coverage.packages.package) {
+            $pkgLine = [math]::Round([double]$pkg.'line-rate' * 100, 2)
+            $pkgBranch = [math]::Round([double]$pkg.'branch-rate' * 100, 2)
+            $summary += "`n| ``$($pkg.name)`` | $pkgLine% | $pkgBranch% |"
+          }
+
+          $summary += "`n`n</details>"
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+      - name: Upload Code Coverage Report
+        if: success() || failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: code-coverage-report
+          path: tests/**/TestResults/**/coverage.cobertura.xml
+          retention-days: 14
