@@ -28,38 +28,47 @@ public abstract class ConvolutionFilterBase : IFilter
         if (width < kernelSize || height < kernelSize || pixels.Length < width * height)
             return;
 
-        double[] flatKernel = new double[kernelSize * kernelSize];
-        for (int ky = 0; ky < kernelSize; ky++)
-            for (int kx = 0; kx < kernelSize; kx++)
-                flatKernel[ky * kernelSize + kx] = kernel2D[ky, kx];
-
-        double factor = Factor;
-        double bias = Bias;
-        bool useAbs = UseAbsoluteValue;
-
-        var (bandCount, seams) = ConvolutionSimdHelper.PrepareBands(pixels, width, height, kernelOffset,
-            out int interiorStart, out int interiorRows, out int rowsPerBand, out int remainderRows);
-        if (bandCount == 0)
-            return;
+        int kernelElements = kernelSize * kernelSize;
+        double[] flatKernel = ArrayPool<double>.Shared.Rent(kernelElements);
 
         try
         {
-            if (bandCount == 1)
+            for (int ky = 0; ky < kernelSize; ky++)
+                for (int kx = 0; kx < kernelSize; kx++)
+                    flatKernel[ky * kernelSize + kx] = kernel2D[ky, kx];
+
+            double factor = Factor;
+            double bias = Bias;
+            bool useAbs = UseAbsoluteValue;
+
+            var (bandCount, seams) = ConvolutionSimdHelper.PrepareBands(pixels, width, height, kernelOffset,
+                out int interiorStart, out int interiorRows, out int rowsPerBand, out int remainderRows);
+            if (bandCount == 0)
+                return;
+
+            try
             {
-                ProcessGenericBand(pixels, null, width, kernelSize, kernelOffset, flatKernel, factor, bias, useAbs, 0, 1, interiorStart, interiorStart + interiorRows);
-            }
-            else
-            {
-                Parallel.For(0, bandCount, bandIndex =>
+                if (bandCount == 1)
                 {
-                    ConvolutionSimdHelper.GetBandBounds(bandIndex, interiorStart, rowsPerBand, remainderRows, out int y0, out int y1);
-                    ProcessGenericBand(pixels, seams, width, kernelSize, kernelOffset, flatKernel, factor, bias, useAbs, bandIndex, bandCount, y0, y1);
-                });
+                    ProcessGenericBand(pixels, null, width, kernelSize, kernelOffset, flatKernel, factor, bias, useAbs, 0, 1, interiorStart, interiorStart + interiorRows);
+                }
+                else
+                {
+                    Parallel.For(0, bandCount, bandIndex =>
+                    {
+                        ConvolutionSimdHelper.GetBandBounds(bandIndex, interiorStart, rowsPerBand, remainderRows, out int y0, out int y1);
+                        ProcessGenericBand(pixels, seams, width, kernelSize, kernelOffset, flatKernel, factor, bias, useAbs, bandIndex, bandCount, y0, y1);
+                    });
+                }
+            }
+            finally
+            {
+                ConvolutionSimdHelper.ReturnSeams(seams);
             }
         }
         finally
         {
-            ConvolutionSimdHelper.ReturnSeams(seams);
+            ArrayPool<double>.Shared.Return(flatKernel);
         }
     }
 

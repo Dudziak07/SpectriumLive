@@ -47,20 +47,25 @@ public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChan
             ? 1.0 + Strength
             : 1.0 / ( 1.0 - Strength );
 
-        double[] dxArray = new double[width];
-        double[] dx2Array = new double[width];
-        for (int x = 0; x < width; x++)
-        {
-            double dx = (x - centerX) * invRadius;
-            dxArray[x] = dx;
-            dx2Array[x] = dx * dx;
-        }
+        bool isQuadratic = Math.Abs(exponent - 2.0) < 1e-9;
+        bool isLinear = Math.Abs(exponent - 1.0) < 1e-9;
+        double expMinus1 = exponent - 1.0;
+
+        double[] dxArray = ArrayPool<double>.Shared.Rent(width);
+        double[] dx2Array = ArrayPool<double>.Shared.Rent(width);
 
         int totalPixels = width * height;
         PixelData[] destination = ArrayPool<PixelData>.Shared.Rent(totalPixels);
 
         try
         {
+            for (int x = 0; x < width; x++)
+            {
+                double dx = (x - centerX) * invRadius;
+                dxArray[x] = dx;
+                dx2Array[x] = dx * dx;
+            }
+
             PixelData clearPixel = new(0, 0, 0, 255);
 
             Parallel.For(0, height, y =>
@@ -100,8 +105,12 @@ public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChan
 
                         if (r > 1e-9)
                         {
-                            double distortedR = Math.Pow(r, exponent);
-                            double scale = (distortedR / r) * radius;
+                            double scale = isQuadratic
+                                ? r * radius
+                                : isLinear
+                                    ? radius
+                                    : Math.Pow(r, expMinus1) * radius;
+
                             srcX = centerX + scale * dx;
                             srcY = centerY + scale * dy;
                         }
@@ -128,6 +137,8 @@ public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChan
         finally
         {
             ArrayPool<PixelData>.Shared.Return(destination);
+            ArrayPool<double>.Shared.Return(dxArray);
+            ArrayPool<double>.Shared.Return(dx2Array);
         }
     }
 }

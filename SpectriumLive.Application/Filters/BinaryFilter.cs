@@ -23,6 +23,12 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
     private int lastTotalPixels;
     private bool isSyncing;
 
+#if NET9_0_OR_GREATER
+    private readonly Lock histogramSyncLock = new();
+#else
+    private readonly object histogramSyncLock = new();
+#endif
+
     private BinarizationMethod selectedMethod = BinarizationMethod.Manual;
     public BinarizationMethod SelectedMethod
     {
@@ -161,7 +167,7 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
 
         lastHistogram ??= new int[256];
         Array.Clear(lastHistogram);
-        CalculateHistogram(pixels, lastHistogram);
+        CalculateHistogram(pixels, lastHistogram, histogramSyncLock);
         lastTotalPixels = length;
 
         int threshold = SelectedMethod switch
@@ -180,7 +186,11 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             PixelSimdHelper.ApplyBinaryThreshold(slice, state));
     }
 
-    private static void CalculateHistogram(PixelData[] pixels, int[] histogram)
+#if NET9_0_OR_GREATER
+    private static void CalculateHistogram(PixelData[] pixels, int[] histogram, Lock syncLock)
+#else
+    private static void CalculateHistogram(PixelData[] pixels, int[] histogram, object syncLock)
+#endif
     {
         int length = pixels.Length;
         if (length == 0)
@@ -201,12 +211,6 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
 
         int chunkSize = (length + partitions - 1) / partitions;
         int chunkCount = (length + chunkSize - 1) / chunkSize;
-
-#if NET9_0_OR_GREATER
-        Lock syncLock = new();
-#else
-        object syncLock = new();
-#endif
 
         Parallel.For(0, chunkCount, chunkIndex =>
         {
@@ -259,40 +263,34 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
 
     private static int CalculateThresholdMeanIterative(int[] histogram)
     {
-        long sum = 0;
+        long sumTotal = 0;
         long totalCount = 0;
 
         for (int i = 0; i < 256; i++)
         {
-            sum += (long)i * histogram[i];
+            sumTotal += (long)i * histogram[i];
             totalCount += histogram[i];
         }
 
         if (totalCount == 0)
             return 128;
 
-        int currentT = (int)(sum / totalCount);
+        int currentT = (int)(sumTotal / totalCount);
         int newT;
         int iterations = 0;
 
         do
         {
             long sumBackground = 0, countBackground = 0;
-            long sumForeground = 0, countForeground = 0;
 
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i <= currentT; i++)
             {
-                if (i <= currentT)
-                {
-                    sumBackground += (long)i * histogram[i];
-                    countBackground += histogram[i];
-                }
-                else
-                {
-                    sumForeground += (long)i * histogram[i];
-                    countForeground += histogram[i];
-                }
+                sumBackground += (long)i * histogram[i];
+                countBackground += histogram[i];
             }
+
+            long sumForeground = sumTotal - sumBackground;
+            long countForeground = totalCount - countBackground;
 
             double meanBackground = countBackground == 0 ? 0 : (double)sumBackground / countBackground;
             double meanForeground = countForeground == 0 ? 255 : (double)sumForeground / countForeground;

@@ -151,7 +151,7 @@ internal static class ConvolutionSimdHelper
         }
     }
 
-    public static void ApplySeparableGaussianBlur(ImageBuffer imageBuffer, ReadOnlySpan<float> kernel1D)
+    public static void ApplySeparableGaussianBlur(ImageBuffer imageBuffer, float[] kernel1D)
     {
         int width = imageBuffer.Width;
         int height = imageBuffer.Height;
@@ -167,20 +167,18 @@ internal static class ConvolutionSimdHelper
         if (bandCount == 0)
             return;
 
-        float[] kernelArray = kernel1D.ToArray();
-
         try
         {
             if (bandCount == 1)
             {
-                ProcessGaussianBand(pixels, null, width, kernelSize, radius, kernelArray, 0, 1, interiorStart, interiorStart + interiorRows);
+                ProcessGaussianBand(pixels, null, width, kernelSize, radius, kernel1D, 0, 1, interiorStart, interiorStart + interiorRows);
             }
             else
             {
                 Parallel.For(0, bandCount, bandIndex =>
                 {
                     GetBandBounds(bandIndex, interiorStart, rowsPerBand, remainderRows, out int y0, out int y1);
-                    ProcessGaussianBand(pixels, seams, width, kernelSize, radius, kernelArray, bandIndex, bandCount, y0, y1);
+                    ProcessGaussianBand(pixels, seams, width, kernelSize, radius, kernel1D, bandIndex, bandCount, y0, y1);
                 });
             }
         }
@@ -189,6 +187,9 @@ internal static class ConvolutionSimdHelper
             ReturnSeams(seams);
         }
     }
+
+    public static void ApplySeparableGaussianBlur(ImageBuffer imageBuffer, ReadOnlySpan<float> kernel1D) =>
+        ApplySeparableGaussianBlur(imageBuffer, kernel1D.ToArray());
 
     private static void Process3x3Band(
         PixelData[] pixels,
