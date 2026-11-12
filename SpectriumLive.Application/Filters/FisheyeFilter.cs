@@ -1,5 +1,6 @@
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
+using System.Buffers;
 using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
@@ -29,56 +30,104 @@ public class FisheyeFilter(double strength = 1.0) : IFilter, INotifyPropertyChan
     {
         int width = imageBuffer.Width;
         int height = imageBuffer.Height;
-
         var source = imageBuffer.Pixels;
-        var destination = new PixelData[width * height];
+
+        if (width <= 0 || height <= 0 || source.Length < width * height)
+            return;
 
         double centerX = ( width - 1 ) / 2.0;
         double centerY = ( height - 1 ) / 2.0;
         double radius = Math.Min(centerX, centerY);
 
-        Parallel.For(0, height, y =>
+        if (radius <= 0)
+            return;
+
+        double invRadius = 1.0 / radius;
+        double exponent = Strength >= 0
+            ? 1.0 + Strength
+            : 1.0 / ( 1.0 - Strength );
+
+        double[] dxArray = new double[width];
+        double[] dx2Array = new double[width];
+        for (int x = 0; x < width; x++)
         {
-            double dy = ( y - centerY ) / radius;
-            double dy2 = dy * dy;
+            double dx = (x - centerX) * invRadius;
+            dxArray[x] = dx;
+            dx2Array[x] = dx * dx;
+        }
 
-            for ( int x = 0; x < width; x++ )
+        int totalPixels = width * height;
+        PixelData[] destination = ArrayPool<PixelData>.Shared.Rent(totalPixels);
+
+        try
+        {
+            PixelData clearPixel = new(0, 0, 0, 255);
+
+            Parallel.For(0, height, y =>
             {
-                double dx = ( x - centerX ) / radius;
-                double r = Math.Sqrt(dx * dx + dy2);
+                double dy = ( y - centerY ) * invRadius;
+                double dy2 = dy * dy;
+                int rowOffset = y * width;
+                var dstRow = destination.AsSpan(rowOffset, width);
 
-                if ( r < 1.0 )
+                if (dy2 >= 1.0)
                 {
-                    double srcX, srcY;
+                    dstRow.Fill(clearPixel);
+                    return;
+                }
 
-                    if ( r > 1e-9 )
+                double maxDx = Math.Sqrt(1.0 - dy2);
+                int xStart = (int)Math.Ceiling(centerX - maxDx * radius);
+                int xEnd = (int)Math.Floor(centerX + maxDx * radius);
+
+                xStart = Math.Clamp(xStart, 0, width);
+                xEnd = Math.Clamp(xEnd, -1, width - 1);
+
+                if (xStart > 0)
+                    dstRow.Slice(0, xStart).Fill(clearPixel);
+
+                if (xEnd + 1 < width)
+                    dstRow.Slice(xEnd + 1, width - (xEnd + 1)).Fill(clearPixel);
+
+                for (int x = xStart; x <= xEnd; x++)
+                {
+                    double dx = dxArray[x];
+                    double r = Math.Sqrt(dx2Array[x] + dy2);
+
+                    if (r < 1.0)
                     {
-                        double distortedR = Strength >= 0
-                            ? Math.Pow(r, 1 + Strength)
-                            : Math.Pow(r, 1.0 / ( 1 - Strength ));
+                        double srcX, srcY;
 
-                        double scale = ( distortedR / r ) * radius;
-                        srcX = centerX + scale * dx;
-                        srcY = centerY + scale * dy;
+                        if (r > 1e-9)
+                        {
+                            double distortedR = Math.Pow(r, exponent);
+                            double scale = (distortedR / r) * radius;
+                            srcX = centerX + scale * dx;
+                            srcY = centerY + scale * dy;
+                        }
+                        else
+                        {
+                            srcX = centerX;
+                            srcY = centerY;
+                        }
+
+                        int ix = Math.Clamp((int)(srcX + 0.5), 0, width - 1);
+                        int iy = Math.Clamp((int)(srcY + 0.5), 0, height - 1);
+
+                        dstRow[x] = source[iy * width + ix];
                     }
                     else
                     {
-                        srcX = centerX;
-                        srcY = centerY;
+                        dstRow[x] = clearPixel;
                     }
-
-                    int ix = Math.Clamp((int)( srcX + 0.5 ), 0, width - 1);
-                    int iy = Math.Clamp((int)( srcY + 0.5 ), 0, height - 1);
-
-                    destination[y * width + x] = source[iy * width + ix];
                 }
-                else
-                {
-                    destination[y * width + x] = new PixelData(0, 0, 0, 255);
-                }
-            }
-        });
+            });
 
-        Array.Copy(destination, imageBuffer.Pixels, destination.Length);
+            Array.Copy(destination, imageBuffer.Pixels, totalPixels);
+        }
+        finally
+        {
+            ArrayPool<PixelData>.Shared.Return(destination);
+        }
     }
 }

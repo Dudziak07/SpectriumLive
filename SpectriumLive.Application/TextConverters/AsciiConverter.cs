@@ -2,7 +2,6 @@ using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 using System.ComponentModel;
-using System.Text;
 
 namespace SpectriumLive.Application.TextConverters;
 
@@ -69,34 +68,69 @@ public class AsciiConverter : IImageToTextConverter, INotifyPropertyChanged
         if ( widthInBlocks == 0 || heightInBlocks == 0 )
             return string.Empty;
 
-        var rows = new string[heightInBlocks];
         int maxCharIndex = asciiChars.Length - 1;
-
-        Parallel.For(0, heightInBlocks, y =>
+        char[] charLut = new char[256];
+        for (int g = 0; g < 256; g++)
         {
-            int sourceY = (int)( y / FontAspectRatio * validBlockSize );
-            sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
-            int rowOffset = sourceY * imageBuffer.Width;
+            int index = (int)Math.Round(g / 255.0 * maxCharIndex);
+            charLut[g] = asciiChars[index];
+        }
 
-            rows[y] = string.Create(widthInBlocks, (rowOffset, imageBuffer, validBlockSize, asciiChars, maxCharIndex), static (span, state) =>
+        string nl = Environment.NewLine;
+        int nlLen = nl.Length;
+        int lineLength = widthInBlocks + nlLen;
+
+        var rows = new string[heightInBlocks];
+
+        if (heightInBlocks < 64)
+        {
+            for (int y = 0; y < heightInBlocks; y++)
             {
-                var (rOffset, imgBuffer, vBlockSize, chars, maxIdx) = state;
-                var pixels = imgBuffer.Pixels;
-                int imgWidth = imgBuffer.Width;
-
-                for ( int x = 0; x < span.Length; x++ )
-                {
-                    int sourceX = Math.Min(x * vBlockSize, imgWidth - 1);
-                    var pixel = pixels[rOffset + sourceX];
-                    byte grayValue = ColorCalculator.ToGrayscale(pixel);
-
-                    int index = (int)Math.Round(grayValue / 255.0 * maxIdx);
-                    span[x] = chars[index];
-                }
+                rows[y] = CreateRowString(y, widthInBlocks, validBlockSize, nl, nlLen, lineLength, imageBuffer, charLut);
+            }
+        }
+        else
+        {
+            Parallel.For(0, heightInBlocks, y =>
+            {
+                rows[y] = CreateRowString(y, widthInBlocks, validBlockSize, nl, nlLen, lineLength, imageBuffer, charLut);
             });
-        });
+        }
 
-        return string.Join(Environment.NewLine, rows) + Environment.NewLine;
+        return string.Concat(rows);
+    }
+
+    private static string CreateRowString(
+        int y,
+        int widthInBlocks,
+        int validBlockSize,
+        string nl,
+        int nlLen,
+        int lineLength,
+        ImageBuffer imageBuffer,
+        char[] charLut)
+    {
+        int sourceY = (int)( y / FontAspectRatio * validBlockSize );
+        sourceY = Math.Min(sourceY, imageBuffer.Height - 1);
+        int rowOffset = sourceY * imageBuffer.Width;
+
+        return string.Create(lineLength, (rowOffset, imageBuffer, validBlockSize, charLut, widthInBlocks, nl, nlLen), static (span, state) =>
+        {
+            var (rOffset, imgBuffer, vBlockSize, lut, wBlocks, newlineStr, newlineLen) = state;
+            var pixels = imgBuffer.Pixels;
+            int imgWidth = imgBuffer.Width;
+
+            for (int x = 0; x < wBlocks; x++)
+            {
+                int sourceX = Math.Min(x * vBlockSize, imgWidth - 1);
+                var pixel = pixels[rOffset + sourceX];
+                byte grayValue = ColorCalculator.ToGrayscale(pixel);
+                span[x] = lut[grayValue];
+            }
+
+            for (int k = 0; k < newlineLen; k++)
+                span[wBlocks + k] = newlineStr[k];
+        });
     }
 
     public string Convert(ImageBuffer imageBuffer, int blockSize)

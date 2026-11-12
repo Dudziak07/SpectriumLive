@@ -1,4 +1,5 @@
 using SpectriumLive.Core.Entities;
+using System.Runtime.InteropServices;
 
 namespace SpectriumLive.Application.Helpers;
 
@@ -24,17 +25,47 @@ public static class ImageResizer
             xMap[x] = Math.Min((int)Math.Round((double)x / newWidth * source.Width), source.Width - 1);
         }
 
-        Parallel.For(0, newHeight, y =>
+        int[] yMap = new int[newHeight];
+        for ( int y = 0; y < newHeight; y++ )
         {
-            int sourceY = Math.Min((int)Math.Round((double)y / newHeight * source.Height), source.Height - 1);
-            int sourceRowOffset = sourceY * source.Width;
-            int destRowOffset = y * newWidth;
+            yMap[y] = Math.Min((int)Math.Round((double)y / newHeight * source.Height), source.Height - 1);
+        }
 
-            for ( int x = 0; x < newWidth; x++ )
+        int srcWidth = source.Width;
+        PixelData[] srcPixels = source.Pixels;
+        PixelData[] dstPixels = resizedPixels;
+        int totalDestPixels = newWidth * newHeight;
+
+        if (totalDestPixels < 65_536 || Environment.ProcessorCount <= 1)
+        {
+            var srcUint = MemoryMarshal.Cast<PixelData, uint>(srcPixels.AsSpan());
+            var dstUint = MemoryMarshal.Cast<PixelData, uint>(dstPixels.AsSpan());
+
+            for (int y = 0; y < newHeight; y++)
             {
-                resizedPixels[destRowOffset + x] = source.Pixels[sourceRowOffset + xMap[x]];
+                int sourceRowOffset = yMap[y] * srcWidth;
+                int destRowOffset = y * newWidth;
+                for (int x = 0; x < newWidth; x++)
+                {
+                    dstUint[destRowOffset + x] = srcUint[sourceRowOffset + xMap[x]];
+                }
             }
-        });
+        }
+        else
+        {
+            Parallel.For(0, newHeight, y =>
+            {
+                int sourceRowOffset = yMap[y] * srcWidth;
+                int destRowOffset = y * newWidth;
+                var srcUintRow = MemoryMarshal.Cast<PixelData, uint>(srcPixels.AsSpan(sourceRowOffset, srcWidth));
+                var dstUintRow = MemoryMarshal.Cast<PixelData, uint>(dstPixels.AsSpan(destRowOffset, newWidth));
+
+                for (int x = 0; x < newWidth; x++)
+                {
+                    dstUintRow[x] = srcUintRow[xMap[x]];
+                }
+            });
+        }
 
         return new(newWidth, newHeight, resizedPixels);
     }
