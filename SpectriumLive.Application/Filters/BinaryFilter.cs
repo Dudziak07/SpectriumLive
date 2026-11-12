@@ -1,7 +1,6 @@
 using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
-using System.Collections.Concurrent;
 using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
@@ -160,7 +159,9 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         var pixels = imageBuffer.Pixels;
         int length = pixels.Length;
 
-        lastHistogram = CalculateHistogram(pixels);
+        lastHistogram ??= new int[256];
+        Array.Clear(lastHistogram);
+        CalculateHistogram(pixels, lastHistogram);
         lastTotalPixels = length;
 
         int threshold = SelectedMethod switch
@@ -175,29 +176,31 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         CalculatedThreshold = threshold;
         SyncUIFromCalculatedThreshold(threshold);
 
-        Parallel.For(0, length, i =>
-        {
-            var pixel = pixels[i];
-            var gray = ColorCalculator.ToGrayscale(pixel);
-            byte finalValue = gray < threshold ? (byte)0 : (byte)255;
-            pixels[i] = new(finalValue, finalValue, finalValue, pixel.A);
-        });
+        PixelSimdHelper.ForEachSlice(pixels, threshold, static (slice, state) =>
+            PixelSimdHelper.ApplyBinaryThreshold(slice, state));
     }
 
-    private static int[] CalculateHistogram(PixelData[] pixels)
+    private static void CalculateHistogram(PixelData[] pixels, int[] histogram)
     {
-        int[] histogram = new int[256];
         int length = pixels.Length;
+        if (length == 0)
+            return;
 
-        if (length < 10000)
+        if (length < PixelSimdHelper.ParallelPixelThreshold || Environment.ProcessorCount <= 1)
         {
-            for (int i = 0; i < length; i++)
-            {
-                var gray = ColorCalculator.ToGrayscale(pixels[i]);
-                histogram[gray]++;
-            }
-            return histogram;
+            PixelSimdHelper.AccumulateHistogram(pixels, histogram);
+            return;
         }
+
+        int partitions = Math.Min(Environment.ProcessorCount, length / (PixelSimdHelper.ParallelPixelThreshold / 2));
+        if (partitions <= 1)
+        {
+            PixelSimdHelper.AccumulateHistogram(pixels, histogram);
+            return;
+        }
+
+        int chunkSize = (length + partitions - 1) / partitions;
+        int chunkCount = (length + chunkSize - 1) / chunkSize;
 
 #if NET9_0_OR_GREATER
         Lock syncLock = new();
@@ -205,28 +208,21 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         object syncLock = new();
 #endif
 
-        Parallel.ForEach(
-            Partitioner.Create(0, length),
-            () => new int[256],
-            (range, _, localHist) =>
-            {
-                for (int i = range.Item1; i < range.Item2; i++)
-                {
-                    var gray = ColorCalculator.ToGrayscale(pixels[i]);
-                    localHist[gray]++;
-                }
-                return localHist;
-            },
-            localHist =>
-            {
-                lock (syncLock)
-                {
-                    for (int i = 0; i < 256; i++)
-                        histogram[i] += localHist[i];
-                }
-            });
+        Parallel.For(0, chunkCount, chunkIndex =>
+        {
+            int start = chunkIndex * chunkSize;
+            int count = Math.Min(chunkSize, length - start);
+            Span<int> localHist = stackalloc int[256];
+            localHist.Clear();
 
-        return histogram;
+            PixelSimdHelper.AccumulateHistogram(pixels.AsSpan(start, count), localHist);
+
+            lock (syncLock)
+            {
+                for (int i = 0; i < 256; i++)
+                    histogram[i] += localHist[i];
+            }
+        });
     }
 
     private static int CalculateThresholdFromPercent(int[] histogram, int totalPixels, double percent)
