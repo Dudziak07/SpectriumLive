@@ -199,7 +199,11 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
             return histogram;
         }
 
+#if NET9_0_OR_GREATER
         Lock syncLock = new();
+#else
+        object syncLock = new();
+#endif
 
         Parallel.ForEach(
             Partitioner.Create(0, length),
