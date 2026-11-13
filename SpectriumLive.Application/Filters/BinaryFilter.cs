@@ -1,7 +1,6 @@
 using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
-using System.Collections.Concurrent;
 using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters;
@@ -23,6 +22,12 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
     private int[]? lastHistogram;
     private int lastTotalPixels;
     private bool isSyncing;
+
+#if NET9_0_OR_GREATER
+    private readonly Lock histogramSyncLock = new();
+#else
+    private readonly object histogramSyncLock = new();
+#endif
 
     private BinarizationMethod selectedMethod = BinarizationMethod.Manual;
     public BinarizationMethod SelectedMethod
@@ -160,7 +165,9 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         var pixels = imageBuffer.Pixels;
         int length = pixels.Length;
 
-        lastHistogram = CalculateHistogram(pixels);
+        lastHistogram ??= new int[256];
+        Array.Clear(lastHistogram);
+        CalculateHistogram(pixels, lastHistogram, histogramSyncLock);
         lastTotalPixels = length;
 
         int threshold = SelectedMethod switch
@@ -175,58 +182,51 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
         CalculatedThreshold = threshold;
         SyncUIFromCalculatedThreshold(threshold);
 
-        Parallel.For(0, length, i =>
-        {
-            var pixel = pixels[i];
-            var gray = ColorCalculator.ToGrayscale(pixel);
-            byte finalValue = gray < threshold ? (byte)0 : (byte)255;
-            pixels[i] = new(finalValue, finalValue, finalValue, pixel.A);
-        });
+        PixelSimdHelper.ForEachSlice(pixels, threshold, static (slice, state) =>
+            PixelSimdHelper.ApplyBinaryThreshold(slice, state));
     }
 
-    private static int[] CalculateHistogram(PixelData[] pixels)
+#if NET9_0_OR_GREATER
+    private static void CalculateHistogram(PixelData[] pixels, int[] histogram, Lock syncLock)
+#else
+    private static void CalculateHistogram(PixelData[] pixels, int[] histogram, object syncLock)
+#endif
     {
-        int[] histogram = new int[256];
         int length = pixels.Length;
+        if (length == 0)
+            return;
 
-        if (length < 10000)
+        if (length < PixelSimdHelper.ParallelPixelThreshold || Environment.ProcessorCount <= 1)
         {
-            for (int i = 0; i < length; i++)
-            {
-                var gray = ColorCalculator.ToGrayscale(pixels[i]);
-                histogram[gray]++;
-            }
-            return histogram;
+            PixelSimdHelper.AccumulateHistogram(pixels, histogram);
+            return;
         }
 
-#if NET9_0_OR_GREATER
-        Lock syncLock = new();
-#else
-        object syncLock = new();
-#endif
+        int partitions = Math.Min(Environment.ProcessorCount, length / (PixelSimdHelper.ParallelPixelThreshold / 2));
+        if (partitions <= 1)
+        {
+            PixelSimdHelper.AccumulateHistogram(pixels, histogram);
+            return;
+        }
 
-        Parallel.ForEach(
-            Partitioner.Create(0, length),
-            () => new int[256],
-            (range, _, localHist) =>
-            {
-                for (int i = range.Item1; i < range.Item2; i++)
-                {
-                    var gray = ColorCalculator.ToGrayscale(pixels[i]);
-                    localHist[gray]++;
-                }
-                return localHist;
-            },
-            localHist =>
-            {
-                lock (syncLock)
-                {
-                    for (int i = 0; i < 256; i++)
-                        histogram[i] += localHist[i];
-                }
-            });
+        int chunkSize = (length + partitions - 1) / partitions;
+        int chunkCount = (length + chunkSize - 1) / chunkSize;
 
-        return histogram;
+        Parallel.For(0, chunkCount, chunkIndex =>
+        {
+            int start = chunkIndex * chunkSize;
+            int count = Math.Min(chunkSize, length - start);
+            Span<int> localHist = stackalloc int[256];
+            localHist.Clear();
+
+            PixelSimdHelper.AccumulateHistogram(pixels.AsSpan(start, count), localHist);
+
+            lock (syncLock)
+            {
+                for (int i = 0; i < 256; i++)
+                    histogram[i] += localHist[i];
+            }
+        });
     }
 
     private static int CalculateThresholdFromPercent(int[] histogram, int totalPixels, double percent)
@@ -263,40 +263,34 @@ public class BinaryFilter : IFilter, INotifyPropertyChanged
 
     private static int CalculateThresholdMeanIterative(int[] histogram)
     {
-        long sum = 0;
+        long sumTotal = 0;
         long totalCount = 0;
 
         for (int i = 0; i < 256; i++)
         {
-            sum += (long)i * histogram[i];
+            sumTotal += (long)i * histogram[i];
             totalCount += histogram[i];
         }
 
         if (totalCount == 0)
             return 128;
 
-        int currentT = (int)(sum / totalCount);
+        int currentT = (int)(sumTotal / totalCount);
         int newT;
         int iterations = 0;
 
         do
         {
             long sumBackground = 0, countBackground = 0;
-            long sumForeground = 0, countForeground = 0;
 
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i <= currentT; i++)
             {
-                if (i <= currentT)
-                {
-                    sumBackground += (long)i * histogram[i];
-                    countBackground += histogram[i];
-                }
-                else
-                {
-                    sumForeground += (long)i * histogram[i];
-                    countForeground += histogram[i];
-                }
+                sumBackground += (long)i * histogram[i];
+                countBackground += histogram[i];
             }
+
+            long sumForeground = sumTotal - sumBackground;
+            long countForeground = totalCount - countBackground;
 
             double meanBackground = countBackground == 0 ? 0 : (double)sumBackground / countBackground;
             double meanForeground = countForeground == 0 ? 255 : (double)sumForeground / countForeground;
