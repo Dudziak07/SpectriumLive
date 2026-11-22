@@ -1,4 +1,4 @@
-﻿using SpectriumLive.Application.Helpers;
+using SpectriumLive.Application.Helpers;
 using SpectriumLive.Core;
 using SpectriumLive.Core.Entities;
 
@@ -12,13 +12,7 @@ public class GrayscaleFilter : IFilter
 
     public void Apply(ImageBuffer imageBuffer)
     {
-        Parallel.For(0, imageBuffer.Pixels.Length, i =>
-        {
-            var pixel = imageBuffer.Pixels[i];
-
-            byte grayByte = ColorCalculator.ToGrayscale(pixel);
-
-            imageBuffer.Pixels[i] = new(grayByte, grayByte, grayByte, pixel.A);
-        });
+        PixelSimdHelper.ForEachSlice(imageBuffer.Pixels, static slice =>
+            PixelSimdHelper.ConvertToGrayscale(slice));
     }
 }

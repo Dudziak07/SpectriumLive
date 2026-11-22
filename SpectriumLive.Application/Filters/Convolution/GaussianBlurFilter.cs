@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using SpectriumLive.Application.Helpers;
+using SpectriumLive.Core.Entities;
+using System.ComponentModel;
 
 namespace SpectriumLive.Application.Filters.Convolution;
 
@@ -10,6 +12,7 @@ public class GaussianBlurFilter : ConvolutionFilterBase, INotifyPropertyChanged
     private double sigma = 1.4;
     private int kernelSize = 5;
     private double[,] kernel;
+    private float[] kernel1D;
     private double factor;
 
     public double Sigma
@@ -51,14 +54,42 @@ public class GaussianBlurFilter : ConvolutionFilterBase, INotifyPropertyChanged
     public GaussianBlurFilter()
     {
         kernel = new double[5, 5];
+        kernel1D = new float[5];
         factor = 1.0;
         RegenerateKernel();
     }
+
+    public override void Apply(ImageBuffer imageBuffer) =>
+        ConvolutionSimdHelper.ApplySeparableGaussianBlur(imageBuffer, kernel1D);
 
     private void RegenerateKernel()
     {
         kernel = GenerateGaussianKernel(kernelSize, sigma);
         factor = CalculateFactor(kernel);
+        kernel1D = GenerateGaussianKernel1D(kernelSize, sigma);
+    }
+
+    private static float[] GenerateGaussianKernel1D(int size, double sigma)
+    {
+        var raw = new double[size];
+        int center = size / 2;
+        double twoSigma2 = 2.0 * sigma * sigma;
+        double sum = 0.0;
+
+        for (int i = 0; i < size; i++)
+        {
+            int d = i - center;
+            double v = Math.Exp(-(d * d) / twoSigma2);
+            raw[i] = v;
+            sum += v;
+        }
+
+        double invSum = sum > 0.0 ? 1.0 / sum : 1.0;
+        var result = new float[size];
+        for (int i = 0; i < size; i++)
+            result[i] = (float)(raw[i] * invSum);
+
+        return result;
     }
 
     private static double[,] GenerateGaussianKernel(int size, double sigma)
