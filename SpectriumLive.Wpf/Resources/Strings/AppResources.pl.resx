@@ -279,4 +279,19 @@
   <data name="PercentBlack_Label" xml:space="preserve">
     <value>Procent czerni:</value>
   </data>
+  <data name="Filter_BrightnessContrast" xml:space="preserve">
+    <value>Jasność / Kontrast</value>
+  </data>
+  <data name="Filter_Sharpen" xml:space="preserve">
+    <value>Wyostrzanie</value>
+  </data>
+  <data name="Filter_SobelEdge" xml:space="preserve">
+    <value>Krawędzie Sobela</value>
+  </data>
+  <data name="Brightness_Label" xml:space="preserve">
+    <value>Jasność:</value>
+  </data>
+  <data name="Contrast_Label" xml:space="preserve">
+    <value>Kontrast:</value>
+  </data>
 </root>

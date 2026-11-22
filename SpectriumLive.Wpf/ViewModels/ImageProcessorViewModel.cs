@@ -30,6 +30,9 @@ public class ImageProcessorViewModel
             "Box Blur" => AppResources.Filter_BoxBlur,
             "Gaussian Blur" => AppResources.Filter_GaussianBlur,
             "Edge Detection" => AppResources.Filter_EdgeDetection,
+            "Sharpen" => AppResources.Filter_Sharpen,
+            "Sobel Edge" => AppResources.Filter_SobelEdge,
+            "Brightness / Contrast" => AppResources.Filter_BrightnessContrast,
             "Fisheye" => AppResources.Filter_Fisheye,
             _ => processorName
         };

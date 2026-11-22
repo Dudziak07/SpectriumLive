@@ -647,5 +647,70 @@ internal static class PixelSimdHelper
                 Unsafe.Add(ref dst, b) += Unsafe.Add(ref h0, b) + Unsafe.Add(ref h1, b) + Unsafe.Add(ref h2, b) + Unsafe.Add(ref h3, b);
         }
     }
+
+    public static void ApplyLut(Span<PixelData> slice, byte[] lut)
+    {
+        if (slice.IsEmpty || lut.Length < 256)
+            return;
+
+        if (!BitConverter.IsLittleEndian)
+        {
+            for (int k = 0; k < slice.Length; k++)
+            {
+                var p = slice[k];
+                slice[k] = new PixelData(lut[p.R], lut[p.G], lut[p.B], p.A);
+            }
+            return;
+        }
+
+        Span<uint> data = MemoryMarshal.Cast<PixelData, uint>(slice);
+        ref uint ptr = ref MemoryMarshal.GetReference(data);
+        ref byte lutRef = ref MemoryMarshal.GetArrayDataReference(lut);
+        int len = data.Length;
+        int i = 0;
+
+        int unrolledEnd = len - 4;
+        for (; i <= unrolledEnd; i += 4)
+        {
+            uint p0 = Unsafe.Add(ref ptr, i);
+            uint p1 = Unsafe.Add(ref ptr, i + 1);
+            uint p2 = Unsafe.Add(ref ptr, i + 2);
+            uint p3 = Unsafe.Add(ref ptr, i + 3);
+
+            Unsafe.Add(ref ptr, i) =
+                Unsafe.Add(ref lutRef, (nuint)(p0 & 0xFFu))
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p0 >> 8) & 0xFFu)) << 8)
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p0 >> 16) & 0xFFu)) << 16)
+                | (p0 & 0xFF000000u);
+
+            Unsafe.Add(ref ptr, i + 1) =
+                Unsafe.Add(ref lutRef, (nuint)(p1 & 0xFFu))
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p1 >> 8) & 0xFFu)) << 8)
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p1 >> 16) & 0xFFu)) << 16)
+                | (p1 & 0xFF000000u);
+
+            Unsafe.Add(ref ptr, i + 2) =
+                Unsafe.Add(ref lutRef, (nuint)(p2 & 0xFFu))
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p2 >> 8) & 0xFFu)) << 8)
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p2 >> 16) & 0xFFu)) << 16)
+                | (p2 & 0xFF000000u);
+
+            Unsafe.Add(ref ptr, i + 3) =
+                Unsafe.Add(ref lutRef, (nuint)(p3 & 0xFFu))
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p3 >> 8) & 0xFFu)) << 8)
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p3 >> 16) & 0xFFu)) << 16)
+                | (p3 & 0xFF000000u);
+        }
+
+        for (; i < len; i++)
+        {
+            uint p = Unsafe.Add(ref ptr, i);
+            Unsafe.Add(ref ptr, i) =
+                Unsafe.Add(ref lutRef, (nuint)(p & 0xFFu))
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p >> 8) & 0xFFu)) << 8)
+                | ((uint)Unsafe.Add(ref lutRef, (nuint)((p >> 16) & 0xFFu)) << 16)
+                | (p & 0xFF000000u);
+        }
+    }
 }
 
