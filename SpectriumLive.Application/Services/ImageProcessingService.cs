@@ -13,6 +13,7 @@ public class ImageProcessingService
 
         // Color
         yield return new BinaryFilter();
+        yield return new BrightnessContrastFilter();
         yield return new GrayscaleFilter();
         yield return new NegativeFilter();
         yield return new SepiaFilter();
@@ -23,6 +24,8 @@ public class ImageProcessingService
         yield return new BoxBlurFilter();
         yield return new GaussianBlurFilter();
         yield return new EdgeDetectionFilter();
+        yield return new SharpenFilter();
+        yield return new SobelEdgeFilter();
 
         // Distortion
         yield return new FisheyeFilter(1.0); // Fisheye

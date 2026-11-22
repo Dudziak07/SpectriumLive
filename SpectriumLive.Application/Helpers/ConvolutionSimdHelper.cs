@@ -677,4 +677,341 @@ internal static class ConvolutionSimdHelper
             Unsafe.Add(ref dstRef, fOff + 2) = (byte)Math.Clamp(sumB, 0.0f, 255.0f);
         }
     }
+
+    public static void ApplySharpen3x3(ImageBuffer imageBuffer)
+    {
+        int width = imageBuffer.Width;
+        int height = imageBuffer.Height;
+        var pixels = imageBuffer.Pixels;
+        if (width < 3 || height < 3 || pixels.Length < width * height)
+            return;
+
+        var (bandCount, seams) = PrepareBands(pixels, width, height, 1,
+            out int interiorStart, out int interiorRows, out int rowsPerBand, out int remainderRows);
+        if (bandCount == 0)
+            return;
+
+        try
+        {
+            if (bandCount == 1)
+            {
+                ProcessSharpenBand(pixels, null, width, bandIndex: 0, bandCount: 1, interiorStart, interiorStart + interiorRows);
+            }
+            else
+            {
+                Parallel.For(0, bandCount, bandIndex =>
+                {
+                    GetBandBounds(bandIndex, interiorStart, rowsPerBand, remainderRows, out int y0, out int y1);
+                    ProcessSharpenBand(pixels, seams, width, bandIndex, bandCount, y0, y1);
+                });
+            }
+        }
+        finally
+        {
+            ReturnSeams(seams);
+        }
+    }
+
+    private static void ProcessSharpenBand(
+        PixelData[] pixels,
+        PixelData[][]? seams,
+        int width,
+        int bandIndex,
+        int bandCount,
+        int y0,
+        int y1)
+    {
+        PixelData[] ring = ArrayPool<PixelData>.Shared.Rent(width * 3);
+        try
+        {
+            var r0 = ring.AsSpan(0, width);
+            var r1 = ring.AsSpan(width, width);
+            var r2 = ring.AsSpan(width * 2, width);
+
+            GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y0 - 1).CopyTo(r0);
+            GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y0).CopyTo(r1);
+
+            for (int y = y0; y < y1; y++)
+            {
+                GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y + 1).CopyTo(r2);
+                var dstRow = pixels.AsSpan(y * width, width);
+
+                CombineSharpenRow(r0, r1, r2, dstRow, width);
+
+                var tmp = r0;
+                r0 = r1;
+                r1 = r2;
+                r2 = tmp;
+            }
+        }
+        finally
+        {
+            ArrayPool<PixelData>.Shared.Return(ring);
+        }
+    }
+
+    private static void CombineSharpenRow(
+        ReadOnlySpan<PixelData> topRow,
+        ReadOnlySpan<PixelData> midRow,
+        ReadOnlySpan<PixelData> botRow,
+        Span<PixelData> dstRow,
+        int width)
+    {
+        ref byte topRef = ref MemoryMarshal.GetReference(MemoryMarshal.AsBytes(topRow));
+        ref byte midRef = ref MemoryMarshal.GetReference(MemoryMarshal.AsBytes(midRow));
+        ref byte botRef = ref MemoryMarshal.GetReference(MemoryMarshal.AsBytes(botRow));
+        ref byte dstRef = ref MemoryMarshal.GetReference(MemoryMarshal.AsBytes(dstRow));
+
+        int x = 1;
+        int end = width - 1;
+
+        if (Avx512BW.IsSupported && BitConverter.IsLittleEndian && end - x >= 8)
+        {
+            var five = Vector512.Create((short)5);
+            var zero = Vector512<short>.Zero;
+            var max255 = Vector512.Create((short)255);
+            var rgbMask = Vector256.Create(0x00FFFFFFu).AsByte();
+            var aMask = Vector256.Create(0xFF000000u).AsByte();
+            int simdEnd = end - 8;
+
+            for (; x <= simdEnd; x += 8)
+            {
+                int offset = x * 4;
+                Vector256<byte> orig = Vector256.LoadUnsafe(ref midRef, (nuint)offset);
+                Vector512<short> center = Avx512BW.ConvertToVector512Int16(orig);
+                Vector512<short> top = Avx512BW.ConvertToVector512Int16(Vector256.LoadUnsafe(ref topRef, (nuint)offset));
+                Vector512<short> bot = Avx512BW.ConvertToVector512Int16(Vector256.LoadUnsafe(ref botRef, (nuint)offset));
+                Vector512<short> left = Avx512BW.ConvertToVector512Int16(Vector256.LoadUnsafe(ref midRef, (nuint)(offset - 4)));
+                Vector512<short> right = Avx512BW.ConvertToVector512Int16(Vector256.LoadUnsafe(ref midRef, (nuint)(offset + 4)));
+
+                Vector512<short> res = center * five - (top + bot + left + right);
+                res = Vector512.Min(Vector512.Max(res, zero), max255);
+                Vector256<byte> packed = Vector512.Narrow(res.AsUInt16(), res.AsUInt16()).GetLower();
+                ((packed & rgbMask) | (orig & aMask)).StoreUnsafe(ref dstRef, (nuint)offset);
+            }
+        }
+
+        if (Avx2.IsSupported && BitConverter.IsLittleEndian && end - x >= 4)
+        {
+            var five = Vector256.Create((short)5);
+            var zero = Vector256<short>.Zero;
+            var max255 = Vector256.Create((short)255);
+            var rgbMask = Vector128.Create(0x00FFFFFFu).AsByte();
+            var aMask = Vector128.Create(0xFF000000u).AsByte();
+            int simdEnd = end - 4;
+
+            for (; x <= simdEnd; x += 4)
+            {
+                int offset = x * 4;
+                Vector128<byte> orig = Vector128.LoadUnsafe(ref midRef, (nuint)offset);
+                Vector256<short> center = Avx2.ConvertToVector256Int16(orig);
+                Vector256<short> top = Avx2.ConvertToVector256Int16(Vector128.LoadUnsafe(ref topRef, (nuint)offset));
+                Vector256<short> bot = Avx2.ConvertToVector256Int16(Vector128.LoadUnsafe(ref botRef, (nuint)offset));
+                Vector256<short> left = Avx2.ConvertToVector256Int16(Vector128.LoadUnsafe(ref midRef, (nuint)(offset - 4)));
+                Vector256<short> right = Avx2.ConvertToVector256Int16(Vector128.LoadUnsafe(ref midRef, (nuint)(offset + 4)));
+
+                Vector256<short> res = center * five - (top + bot + left + right);
+                res = Vector256.Min(Vector256.Max(res, zero), max255);
+                Vector128<byte> packed = Vector256.Narrow(res.AsUInt16(), res.AsUInt16()).GetLower();
+                ((packed & rgbMask) | (orig & aMask)).StoreUnsafe(ref dstRef, (nuint)offset);
+            }
+        }
+
+        for (; x < end; x++)
+        {
+            int u = x * 4;
+            int r = 5 * Unsafe.Add(ref midRef, u)
+                  - (Unsafe.Add(ref topRef, u) + Unsafe.Add(ref botRef, u) + Unsafe.Add(ref midRef, u - 4) + Unsafe.Add(ref midRef, u + 4));
+            int g = 5 * Unsafe.Add(ref midRef, u + 1)
+                  - (Unsafe.Add(ref topRef, u + 1) + Unsafe.Add(ref botRef, u + 1) + Unsafe.Add(ref midRef, u - 3) + Unsafe.Add(ref midRef, u + 5));
+            int b = 5 * Unsafe.Add(ref midRef, u + 2)
+                  - (Unsafe.Add(ref topRef, u + 2) + Unsafe.Add(ref botRef, u + 2) + Unsafe.Add(ref midRef, u - 2) + Unsafe.Add(ref midRef, u + 6));
+
+            Unsafe.Add(ref dstRef, u) = (byte)Math.Clamp(r, 0, 255);
+            Unsafe.Add(ref dstRef, u + 1) = (byte)Math.Clamp(g, 0, 255);
+            Unsafe.Add(ref dstRef, u + 2) = (byte)Math.Clamp(b, 0, 255);
+        }
+    }
+
+    public static void ApplySobel3x3(ImageBuffer imageBuffer)
+    {
+        int width = imageBuffer.Width;
+        int height = imageBuffer.Height;
+        var pixels = imageBuffer.Pixels;
+        if (width < 3 || height < 3 || pixels.Length < width * height)
+            return;
+
+        var (bandCount, seams) = PrepareBands(pixels, width, height, 1,
+            out int interiorStart, out int interiorRows, out int rowsPerBand, out int remainderRows);
+        if (bandCount == 0)
+            return;
+
+        try
+        {
+            if (bandCount == 1)
+            {
+                ProcessSobelBand(pixels, null, width, bandIndex: 0, bandCount: 1, interiorStart, interiorStart + interiorRows);
+            }
+            else
+            {
+                Parallel.For(0, bandCount, bandIndex =>
+                {
+                    GetBandBounds(bandIndex, interiorStart, rowsPerBand, remainderRows, out int y0, out int y1);
+                    ProcessSobelBand(pixels, seams, width, bandIndex, bandCount, y0, y1);
+                });
+            }
+        }
+        finally
+        {
+            ReturnSeams(seams);
+        }
+    }
+
+    private static void ProcessSobelBand(
+        PixelData[] pixels,
+        PixelData[][]? seams,
+        int width,
+        int bandIndex,
+        int bandCount,
+        int y0,
+        int y1)
+    {
+        short[] ring = ArrayPool<short>.Shared.Rent(width * 3);
+        try
+        {
+            var g0 = ring.AsSpan(0, width);
+            var g1 = ring.AsSpan(width, width);
+            var g2 = ring.AsSpan(width * 2, width);
+
+            ComputeGrayscaleRow(GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y0 - 1), g0, width);
+            ComputeGrayscaleRow(GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y0), g1, width);
+
+            for (int y = y0; y < y1; y++)
+            {
+                ComputeGrayscaleRow(GetSourceRow(pixels, seams, width, 1, bandIndex, bandCount, y0, y1, y + 1), g2, width);
+                var dstRow = pixels.AsSpan(y * width, width);
+
+                CombineSobelRow(g0, g1, g2, dstRow, width);
+
+                var tmp = g0;
+                g0 = g1;
+                g1 = g2;
+                g2 = tmp;
+            }
+        }
+        finally
+        {
+            ArrayPool<short>.Shared.Return(ring);
+        }
+    }
+
+    private static void ComputeGrayscaleRow(ReadOnlySpan<PixelData> srcRow, Span<short> dstGray, int width)
+    {
+        ref short dstRef = ref MemoryMarshal.GetReference(dstGray);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            ReadOnlySpan<uint> srcU32 = MemoryMarshal.Cast<PixelData, uint>(srcRow);
+            ref uint srcRef = ref MemoryMarshal.GetReference(srcU32);
+            int x = 0;
+            int unrolledEnd = width - 4;
+
+            for (; x <= unrolledEnd; x += 4)
+            {
+                uint p0 = Unsafe.Add(ref srcRef, x);
+                uint p1 = Unsafe.Add(ref srcRef, x + 1);
+                uint p2 = Unsafe.Add(ref srcRef, x + 2);
+                uint p3 = Unsafe.Add(ref srcRef, x + 3);
+
+                Unsafe.Add(ref dstRef, x) = (short)((9798u * (p0 & 0xFFu) + 19235u * ((p0 >> 8) & 0xFFu) + 3735u * ((p0 >> 16) & 0xFFu)) >> 15);
+                Unsafe.Add(ref dstRef, x + 1) = (short)((9798u * (p1 & 0xFFu) + 19235u * ((p1 >> 8) & 0xFFu) + 3735u * ((p1 >> 16) & 0xFFu)) >> 15);
+                Unsafe.Add(ref dstRef, x + 2) = (short)((9798u * (p2 & 0xFFu) + 19235u * ((p2 >> 8) & 0xFFu) + 3735u * ((p2 >> 16) & 0xFFu)) >> 15);
+                Unsafe.Add(ref dstRef, x + 3) = (short)((9798u * (p3 & 0xFFu) + 19235u * ((p3 >> 8) & 0xFFu) + 3735u * ((p3 >> 16) & 0xFFu)) >> 15);
+            }
+
+            for (; x < width; x++)
+            {
+                uint p = Unsafe.Add(ref srcRef, x);
+                Unsafe.Add(ref dstRef, x) = (short)((9798u * (p & 0xFFu) + 19235u * ((p >> 8) & 0xFFu) + 3735u * ((p >> 16) & 0xFFu)) >> 15);
+            }
+        }
+        else
+        {
+            for (int x = 0; x < width; x++)
+            {
+                var p = srcRow[x];
+                Unsafe.Add(ref dstRef, x) = (short)((9798u * p.R + 19235u * p.G + 3735u * p.B) >> 15);
+            }
+        }
+    }
+
+    private static void CombineSobelRow(
+        ReadOnlySpan<short> g0,
+        ReadOnlySpan<short> g1,
+        ReadOnlySpan<short> g2,
+        Span<PixelData> dstRow,
+        int width)
+    {
+        ref short r0 = ref MemoryMarshal.GetReference(g0);
+        ref short r1 = ref MemoryMarshal.GetReference(g1);
+        ref short r2 = ref MemoryMarshal.GetReference(g2);
+        Span<byte> dstBytes = MemoryMarshal.AsBytes(dstRow);
+        ref byte dstRef = ref MemoryMarshal.GetReference(dstBytes);
+
+        int x = 1;
+        int end = width - 1;
+
+        if (Avx2.IsSupported && BitConverter.IsLittleEndian && end - x >= 8)
+        {
+            var max255F = Vector256.Create(255.0f);
+            var aMask = Vector256.Create(0xFF000000u);
+            ref uint dstU32 = ref Unsafe.As<byte, uint>(ref dstRef);
+            int simdEnd = end - 8;
+
+            for (; x <= simdEnd; x += 8)
+            {
+                Vector128<short> tl = Vector128.LoadUnsafe(ref r0, (nuint)(x - 1));
+                Vector128<short> t = Vector128.LoadUnsafe(ref r0, (nuint)x);
+                Vector128<short> tr = Vector128.LoadUnsafe(ref r0, (nuint)(x + 1));
+                Vector128<short> l = Vector128.LoadUnsafe(ref r1, (nuint)(x - 1));
+                Vector128<short> r = Vector128.LoadUnsafe(ref r1, (nuint)(x + 1));
+                Vector128<short> bl = Vector128.LoadUnsafe(ref r2, (nuint)(x - 1));
+                Vector128<short> b = Vector128.LoadUnsafe(ref r2, (nuint)x);
+                Vector128<short> br = Vector128.LoadUnsafe(ref r2, (nuint)(x + 1));
+
+                Vector128<short> gx = (tr - tl) + ((r - l) << 1) + (br - bl);
+                Vector128<short> gy = (bl - tl) + ((b - t) << 1) + (br - tr);
+
+                Vector256<float> fgx = Avx.ConvertToVector256Single(Avx2.ConvertToVector256Int32(gx));
+                Vector256<float> fgy = Avx.ConvertToVector256Single(Avx2.ConvertToVector256Int32(gy));
+                Vector256<float> magF = Vector256.Min(Vector256.Sqrt(fgx * fgx + fgy * fgy), max255F);
+                Vector256<uint> mag = Avx.ConvertToVector256Int32WithTruncation(magF).AsUInt32();
+
+                Vector256<uint> rgb = mag | (mag << 8) | (mag << 16);
+                Vector256<uint> orig = Vector256.LoadUnsafe(ref dstU32, (nuint)x);
+                (rgb | (orig & aMask)).StoreUnsafe(ref dstU32, (nuint)x);
+            }
+        }
+
+        for (; x < end; x++)
+        {
+            int tl = Unsafe.Add(ref r0, x - 1);
+            int t = Unsafe.Add(ref r0, x);
+            int tr = Unsafe.Add(ref r0, x + 1);
+            int l = Unsafe.Add(ref r1, x - 1);
+            int r = Unsafe.Add(ref r1, x + 1);
+            int bl = Unsafe.Add(ref r2, x - 1);
+            int b = Unsafe.Add(ref r2, x);
+            int br = Unsafe.Add(ref r2, x + 1);
+
+            int gx = -tl + tr - 2 * l + 2 * r - bl + br;
+            int gy = -tl - 2 * t - tr + bl + 2 * b + br;
+            byte mag = (byte)Math.Min(255, (int)MathF.Sqrt(gx * gx + gy * gy));
+
+            int u = x * 4;
+            Unsafe.Add(ref dstRef, u) = mag;
+            Unsafe.Add(ref dstRef, u + 1) = mag;
+            Unsafe.Add(ref dstRef, u + 2) = mag;
+        }
+    }
 }
