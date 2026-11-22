@@ -94,7 +94,7 @@ jobs:
           --filter *QuickBenchmarks.Grayscale*
 
   build-and-test:
-    name: Build & Coverage (Windows / .NET 10)
+    name: Build & Test (.NET 10)
     runs-on: windows-latest
     timeout-minutes: 15
 
