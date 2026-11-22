@@ -32,21 +32,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-matrix:
-    name: Test Matrix (${{ matrix.os }} / ${{ matrix.tfm }})
+    name: Test Matrix (${{ matrix.os }} / ${{ matrix.target.tfm }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        include:
+        target:
           - tfm: net8.0
             sdk: "8.0.x"
           - tfm: net9.0
             sdk: "9.0.x"
           - tfm: net10.0
             sdk: "10.0.x"
-        exclude: []
+          - tfm: net11.0
+            sdk: "11.0.x"
 
     steps:
       - name: Checkout repository
@@ -57,7 +58,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          dotnet-version: ${{ matrix.sdk }}
+          dotnet-version: ${{ matrix.target.sdk }}
 
       - name: Cache NuGet packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -72,22 +73,22 @@ jobs:
           dotnet restore tests/SpectriumLive.Application.Tests/SpectriumLive.Application.Tests.csproj
           dotnet restore benchmarks/SpectriumLive.Benchmarks/SpectriumLive.Benchmarks.csproj
 
-      - name: Run unit tests (${{ matrix.tfm }})
+      - name: Run unit tests (${{ matrix.target.tfm }})
         run: >-
           dotnet test tests/SpectriumLive.Application.Tests/SpectriumLive.Application.Tests.csproj
           --configuration Release
-          --framework ${{ matrix.tfm }}
+          --framework ${{ matrix.target.tfm }}
           --no-restore
           --filter "Category!=Extreme&Category!=RealAssets"
           --verbosity normal
 
-      - name: Smoke test BenchmarkDotNet (${{ matrix.tfm }})
-        if: matrix.tfm == 'net10.0'
+      - name: Smoke test BenchmarkDotNet (${{ matrix.target.tfm }})
+        if: matrix.target.tfm == 'net10.0'
         run: >-
           dotnet run
           --project benchmarks/SpectriumLive.Benchmarks/SpectriumLive.Benchmarks.csproj
           --configuration Release
-          --framework ${{ matrix.tfm }}
+          --framework ${{ matrix.target.tfm }}
           --no-restore
           --
           --job Dry
@@ -107,7 +108,9 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: |
+            10.0.x
+            11.0.x
 
       - name: Cache NuGet packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -125,6 +128,12 @@ jobs:
 
       - name: Build solution
         run: dotnet build SpectriumLive.sln --configuration Release --no-restore
+
+      - name: Pack NuGet Packages
+        run: |
+          dotnet pack SpectriumLive.Core/SpectriumLive.Core.csproj --configuration Release --no-build --output ./artifacts/nuget
+          dotnet pack SpectriumLive.Application/SpectriumLive.Application.csproj --configuration Release --no-build --output ./artifacts/nuget
+          dotnet pack SpectriumLive.Infrastructure/SpectriumLive.Infrastructure.csproj --configuration Release --no-build --output ./artifacts/nuget
 
       - name: Run unit tests (.NET 10)
         run: dotnet test tests/SpectriumLive.Application.Tests/SpectriumLive.Application.Tests.csproj --configuration Release --framework net10.0 --no-build --filter "Category!=Extreme&Category!=RealAssets" --verbosity normal --logger "trx;LogFileName=results.trx" --collect:"XPlat Code Coverage"
