@@ -11,6 +11,7 @@ public class CameraService(ICameraDeviceEnumerator cameraEnumerator)
     private VideoCapture? videoCapture;
     private CancellationTokenSource? cancellationTokenSource;
     private Task? cameraTask;
+    private int isProcessingFrame;
 
     public Task<ObservableCollection<CameraDevice>> GetAvailableCamerasAsync()
     {
@@ -49,7 +50,17 @@ public class CameraService(ICameraDeviceEnumerator cameraEnumerator)
 
                 if ( !frame.Empty() )
                 {
-                    App.Current?.Dispatcher.Invoke(() => onNewFrame(frame));
+                    if ( Interlocked.CompareExchange(ref isProcessingFrame, 1, 0) == 0 )
+                    {
+                        try
+                        {
+                            onNewFrame(frame);
+                        }
+                        finally
+                        {
+                            Volatile.Write(ref isProcessingFrame, 0);
+                        }
+                    }
                 }
                 else
                 {
@@ -80,5 +91,6 @@ public class CameraService(ICameraDeviceEnumerator cameraEnumerator)
         videoCapture?.Dispose();
         videoCapture = null;
         cameraTask = null;
+        Volatile.Write(ref isProcessingFrame, 0);
     }
 }
