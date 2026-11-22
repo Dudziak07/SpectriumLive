@@ -545,5 +545,50 @@ namespace SpectriumLive.Wpf.Resources.Strings {
                 return ResourceManager.GetString("Threshold_Label", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness:.
+        /// </summary>
+        public static string Brightness_Label {
+            get {
+                return ResourceManager.GetString("Brightness_Label", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Contrast:.
+        /// </summary>
+        public static string Contrast_Label {
+            get {
+                return ResourceManager.GetString("Contrast_Label", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Brightness / Contrast.
+        /// </summary>
+        public static string Filter_BrightnessContrast {
+            get {
+                return ResourceManager.GetString("Filter_BrightnessContrast", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sharpen.
+        /// </summary>
+        public static string Filter_Sharpen {
+            get {
+                return ResourceManager.GetString("Filter_Sharpen", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Sobel Edge.
+        /// </summary>
+        public static string Filter_SobelEdge {
+            get {
+                return ResourceManager.GetString("Filter_SobelEdge", resourceCulture);
+            }
+        }
     }
 }

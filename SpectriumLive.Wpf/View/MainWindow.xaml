@@ -199,6 +199,40 @@
                 </Grid>
             </StackPanel>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type filters:BrightnessContrastFilter}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                    <TextBlock Text="{x:Static strings:AppResources.Brightness_Label}" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding Brightness}"/>
+                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=BrightnessSlider}"/>
+                    <Slider x:Name="BrightnessSlider" Grid.Column="1" Minimum="-255" Maximum="255" Value="{Binding Brightness, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="1" TickPlacement="BottomRight" IsMoveToPointEnabled="True"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=BrightnessSlider}"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="{x:Static strings:AppResources.Contrast_Label}" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding Contrast, StringFormat='{}{0:F2}'}"/>
+                </StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <RepeatButton Grid.Column="0" Content="−" Command="Slider.DecreaseSmall" CommandTarget="{Binding ElementName=ContrastSlider}"/>
+                    <Slider x:Name="ContrastSlider" Grid.Column="1" Minimum="0.0" Maximum="3.0" Value="{Binding Contrast, Mode=TwoWay}" IsSnapToTickEnabled="True" TickFrequency="0.05" TickPlacement="BottomRight" IsMoveToPointEnabled="True"/>
+                    <RepeatButton Grid.Column="2" Content="+" Command="Slider.IncreaseSmall" CommandTarget="{Binding ElementName=ContrastSlider}"/>
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <DockPanel>
