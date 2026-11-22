@@ -371,3 +371,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Local downloaded test image datasets
+.test-assets/

@@ -7,10 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.161" />
-    <PackageReference Include="OpenCvSharp4.Windows" Version="4.13.0.20260627" />
-    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.13.0.20260627" />
+    <PackageReference Include="OpenCvSharp5.Windows" Version="5.0.0.20261109" />
+    <PackageReference Include="OpenCvSharp5.WpfExtensions" Version="5.0.0.20261109" />
     <PackageReference Include="SpectriumLive.Styles" Version="1.11.2" />
   </ItemGroup>
 

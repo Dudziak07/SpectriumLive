@@ -1,0 +1,103 @@
+name: Benchmarks
+
+on:
+  workflow_dispatch:
+    inputs:
+      framework:
+        description: "Target framework to benchmark"
+        required: true
+        type: choice
+        default: "net10.0"
+        options:
+          - "net10.0"
+          - "net9.0"
+          - "net8.0"
+      filter:
+        description: "BenchmarkDotNet filter pattern (e.g. *QuickBenchmarks*, *PowerOfTwoBenchmarks*, or *)"
+        required: true
+        type: string
+        default: "*QuickBenchmarks*"
+      job:
+        description: "BenchmarkDotNet job profile"
+        required: true
+        type: choice
+        default: "short"
+        options:
+          - "short"
+          - "dry"
+          - "medium"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run-benchmarks:
+    name: BenchmarkDotNet (${{ inputs.framework }} / ${{ inputs.job }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET SDKs (8, 9, 10)
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', 'Directory.Build.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Run Benchmarks
+        shell: pwsh
+        env:
+          BENCH_FRAMEWORK: ${{ inputs.framework }}
+          BENCH_FILTER: ${{ inputs.filter }}
+          BENCH_JOB: ${{ inputs.job }}
+        run: |
+          & dotnet run `
+            --project benchmarks/SpectriumLive.Benchmarks/SpectriumLive.Benchmarks.csproj `
+            --configuration Release `
+            --framework $env:BENCH_FRAMEWORK `
+            -- `
+            --job $env:BENCH_JOB `
+            --filter $env:BENCH_FILTER `
+            --exporters json
+
+      - name: Publish Benchmark Summary
+        if: always()
+        shell: pwsh
+        run: |
+          $reports = Get-ChildItem -Path "BenchmarkDotNet.Artifacts/results" -Filter "*-report-github.md" -ErrorAction SilentlyContinue
+          if (-not $reports) {
+            "No benchmark markdown reports found." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            exit 0
+          }
+          foreach ($report in $reports) {
+            "### $($report.BaseName)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            Get-Content $report.FullName | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          }
+
+      - name: Upload Benchmark Artifacts
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: benchmark-results-${{ inputs.framework }}
+          path: BenchmarkDotNet.Artifacts/results/
+          retention-days: 14
+
