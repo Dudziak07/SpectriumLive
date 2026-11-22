@@ -70,8 +70,10 @@ public partial class MainWindowViewModel(
     private bool isCameraFrozen;
 
     private ImageBuffer? originalImageBuffer;
+    private ImageBuffer? cameraWorkingBuffer;
 
     private WriteableBitmap? cameraFrameBitmap;
+    private WriteableBitmap? processedFrameBitmap;
 
     [RelayCommand]
     private void SelectProcessor(ImageProcessorViewModel? processor)
@@ -152,9 +154,15 @@ public partial class MainWindowViewModel(
 
         if ( processor is IFilter filter )
         {
-            var bufferCopy = new ImageBuffer(originalImageBuffer.Width, originalImageBuffer.Height, (PixelData[])originalImageBuffer.Pixels.Clone());
-            filter.Apply(bufferCopy);
-            ProcessedImage = ImageConverter.ToImageSource(bufferCopy);
+            EnsureWorkingBuffer(originalImageBuffer.Width, originalImageBuffer.Height);
+            int totalPixels = originalImageBuffer.Width * originalImageBuffer.Height;
+            Array.Copy(originalImageBuffer.Pixels, cameraWorkingBuffer!.Pixels, totalPixels);
+            filter.Apply(cameraWorkingBuffer);
+            ImageConverter.WriteToWriteableBitmap(cameraWorkingBuffer, ref processedFrameBitmap);
+            if ( !ReferenceEquals(ProcessedImage, processedFrameBitmap) )
+            {
+                ProcessedImage = processedFrameBitmap;
+            }
         }
         else if ( processor is IImageToTextConverter converter )
         {
@@ -223,6 +231,8 @@ public partial class MainWindowViewModel(
         OriginalImage = null;
         ProcessedImage = null;
         cameraFrameBitmap = null;
+        processedFrameBitmap = null;
+        cameraWorkingBuffer = null;
         cameraService.StartCamera(SelectedCameraIndex, OnNewCameraFrame);
     }
 
@@ -232,6 +242,8 @@ public partial class MainWindowViewModel(
         OriginalImage = null;
         ProcessedImage = null;
         cameraFrameBitmap = null;
+        processedFrameBitmap = null;
+        cameraWorkingBuffer = null;
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleCamera))]
@@ -266,17 +278,71 @@ public partial class MainWindowViewModel(
         if ( IsCameraFrozen )
             return;
 
-        if ( cameraFrameBitmap is null ||
-            cameraFrameBitmap.PixelWidth != frame.Width ||
-            cameraFrameBitmap.PixelHeight != frame.Height )
-        {
-            cameraFrameBitmap = new WriteableBitmap(frame.Width, frame.Height, 96, 96, PixelFormats.Bgr24, null);
-            OriginalImage = cameraFrameBitmap;
-        }
-        WriteableBitmapConverter.ToWriteableBitmap(frame, cameraFrameBitmap);
+        ImageConverter.ToImageBuffer(frame, ref originalImageBuffer);
+        ImageBuffer sourceBuffer = originalImageBuffer!;
 
-        originalImageBuffer = ImageConverter.ToImageBuffer(cameraFrameBitmap);
-        ProcessImageBasedOnSelection();
+        var processor = SelectedProcessor?.Processor;
+        string? asciiText = null;
+
+        if ( processor is IFilter filter )
+        {
+            EnsureWorkingBuffer(sourceBuffer.Width, sourceBuffer.Height);
+            int totalPixels = sourceBuffer.Width * sourceBuffer.Height;
+            Array.Copy(sourceBuffer.Pixels, cameraWorkingBuffer!.Pixels, totalPixels);
+            filter.Apply(cameraWorkingBuffer);
+        }
+        else if ( processor is IImageToTextConverter converter )
+        {
+            asciiText = converter.Convert(sourceBuffer);
+        }
+
+        System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+        {
+            if ( !IsCameraRunning || IsCameraFrozen )
+                return;
+
+            if ( cameraFrameBitmap is null ||
+                cameraFrameBitmap.PixelWidth != frame.Width ||
+                cameraFrameBitmap.PixelHeight != frame.Height )
+            {
+                cameraFrameBitmap = new WriteableBitmap(frame.Width, frame.Height, 96, 96, PixelFormats.Bgr24, null);
+                OriginalImage = cameraFrameBitmap;
+            }
+
+            WriteableBitmapConverter.ToWriteableBitmap(frame, cameraFrameBitmap);
+
+            if ( processor is IFilter && cameraWorkingBuffer is not null )
+            {
+                ImageConverter.WriteToWriteableBitmap(cameraWorkingBuffer, ref processedFrameBitmap);
+                if ( !ReferenceEquals(ProcessedImage, processedFrameBitmap) )
+                {
+                    ProcessedImage = processedFrameBitmap;
+                }
+            }
+            else if ( processor is IImageToTextConverter && asciiText is not null )
+            {
+                ProcessedImage = textRendererService.RenderAsciiArt(asciiText, sourceBuffer.Width, sourceBuffer.Height);
+            }
+            else if ( processor is null )
+            {
+                if ( !ReferenceEquals(ProcessedImage, OriginalImage) )
+                {
+                    ProcessedImage = OriginalImage;
+                }
+            }
+        });
+    }
+
+    private void EnsureWorkingBuffer(int width, int height)
+    {
+        int totalPixels = width * height;
+        if ( cameraWorkingBuffer is null ||
+            cameraWorkingBuffer.Width != width ||
+            cameraWorkingBuffer.Height != height ||
+            cameraWorkingBuffer.Pixels.Length != totalPixels )
+        {
+            cameraWorkingBuffer = new ImageBuffer(width, height, new PixelData[totalPixels]);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanClearImage))]
@@ -290,6 +356,8 @@ public partial class MainWindowViewModel(
         else
         {
             originalImageBuffer = null;
+            cameraWorkingBuffer = null;
+            processedFrameBitmap = null;
             OriginalImage = null;
         }
     }
